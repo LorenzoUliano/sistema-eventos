@@ -1,28 +1,35 @@
 import React from "react";
+import { Link, usePage } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
-import { usePage, router } from "@inertiajs/react";
-import { Link } from "@inertiajs/react";
+import PromoterLayout from "@/Layouts/PromoterLayout";
 
 export default function Dashboard() {
-    const { auth } = usePage().props;
-
-    const logout = () => {
-        router.post(route("promoter.logout"));
-    };
+    const { events } = usePage().props;
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen">
-            <h1 className="text-2xl font-bold">Bem-vindo, {auth.user.name}!</h1>
-            <p className="text-gray-500">Você está logado como promoter.</p>
+        <PromoterLayout>
+            <h1 className="text-2xl font-bold text-gray-800">Seus Eventos</h1>
 
-            {/* Apenas promoters podem cadastrar outros promoters */}
-            <Link href={route("promoter.register")}>
-                <Button className="mt-4">Cadastrar Novo Promoter</Button>
-            </Link>
-
-            <Button className="mt-4" onClick={logout}>
-                Sair
-            </Button>
-        </div>
+            {/* Lista de eventos */}
+            {events.length > 0 ? (
+                <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {events.map((event) => (
+                        <div key={event.id} className="bg-white shadow-md rounded-lg p-4">
+                            <h2 className="text-xl font-semibold">{event.name}</h2>
+                            <p className="text-gray-600">{event.description}</p>
+                            <p className="text-gray-500 mt-2">
+                                📍 {event.location}, {event.city} - {event.state}
+                            </p>
+                            <p className="text-gray-500">📅 {new Date(event.start_date).toLocaleDateString()}</p>
+                            <Link href={route("event.show", event.id)}>
+                                <Button className="mt-4 w-full">Gerenciar Evento</Button>
+                            </Link>
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <p className="text-gray-600 mt-6">Você ainda não tem eventos cadastrados.</p>
+            )}
+        </PromoterLayout>
     );
 }

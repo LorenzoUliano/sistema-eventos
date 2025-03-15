@@ -22,15 +22,20 @@ class PromoterAuthenticatedSessionController extends Controller
         ]);
 
         if (Auth::guard('promoter')->attempt($credentials)) {
+            $request->session()->regenerate();
+
             return redirect()->route('promoter.dashboard');
         }
 
         return back()->withErrors(['email' => 'Credenciais inválidas']);
     }
 
-    public function destroy()
+    public function destroy(Request $request)
     {
         Auth::guard('promoter')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
         return redirect()->route('promoter.login');
     }
 }

@@ -1,13 +1,12 @@
 import React from "react";
+import PromoterLayout from "@/Layouts/PromoterLayout";
 import { useForm } from "@inertiajs/react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 
 export default function Register() {
     const { data, setData, post, errors } = useForm({
-        company_id: "",
         name: "",
         email: "",
         phone: "",
@@ -21,78 +20,37 @@ export default function Register() {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen">
-            <Card className="w-[400px]">
-                <CardHeader>
-                    <CardTitle>Cadastro de Promoter</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <form onSubmit={submit} className="space-y-4">
-                        <div>
-                            <Label>ID da Empresa</Label>
-                            <Input
-                                type="text"
-                                placeholder="Digite o ID da empresa"
-                                value={data.company_id}
-                                onChange={(e) => setData("company_id", e.target.value)}
-                            />
-                            {errors.company_id && <p className="text-red-500 text-sm">{errors.company_id}</p>}
-                        </div>
-                        <div>
-                            <Label>Nome</Label>
-                            <Input
-                                type="text"
-                                placeholder="Digite seu nome"
-                                value={data.name}
-                                onChange={(e) => setData("name", e.target.value)}
-                            />
-                            {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
-                        </div>
-                        <div>
-                            <Label>Email</Label>
-                            <Input
-                                type="email"
-                                placeholder="Digite seu email"
-                                value={data.email}
-                                onChange={(e) => setData("email", e.target.value)}
-                            />
-                            {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
-                        </div>
-                        <div>
-                            <Label>Telefone</Label>
-                            <Input
-                                type="text"
-                                placeholder="Digite seu telefone"
-                                value={data.phone}
-                                onChange={(e) => setData("phone", e.target.value)}
-                            />
-                            {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
-                        </div>
-                        <div>
-                            <Label>Senha</Label>
-                            <Input
-                                type="password"
-                                placeholder="Digite sua senha"
-                                value={data.password}
-                                onChange={(e) => setData("password", e.target.value)}
-                            />
-                            {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
-                        </div>
-                        <div>
-                            <Label>Confirmar Senha</Label>
-                            <Input
-                                type="password"
-                                placeholder="Confirme sua senha"
-                                value={data.password_confirmation}
-                                onChange={(e) => setData("password_confirmation", e.target.value)}
-                            />
-                        </div>
-                        <Button type="submit" className="w-full">
-                            Cadastrar
-                        </Button>
-                    </form>
-                </CardContent>
-            </Card>
-        </div>
+        <PromoterLayout>
+            <div className="max-w-lg mx-auto bg-white shadow-md rounded-lg p-6">
+                <h1 className="text-2xl font-bold mb-4">Cadastrar Novo Promoter</h1>
+                <form onSubmit={submit} className="space-y-4">
+                    <div>
+                        <Label>Nome</Label>
+                        <Input type="text" value={data.name} onChange={(e) => setData("name", e.target.value)} />
+                        {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+                    </div>
+                    <div>
+                        <Label>Email</Label>
+                        <Input type="email" value={data.email} onChange={(e) => setData("email", e.target.value)} />
+                        {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+                    </div>
+                    <div>
+                        <Label>Telefone</Label>
+                        <Input type="text" value={data.phone} onChange={(e) => setData("phone", e.target.value)} />
+                    </div>
+                    <div>
+                        <Label>Senha</Label>
+                        <Input type="password" value={data.password} onChange={(e) => setData("password", e.target.value)} />
+                    </div>
+                    <div>
+                        <Label>Confirmar Senha</Label>
+                        <Input type="password" value={data.password_confirmation} onChange={(e) => setData("password_confirmation", e.target.value)} />
+                    </div>
+                    <Button type="submit" className="w-full">
+                        Cadastrar
+                    </Button>
+                </form>
+            </div>
+        </PromoterLayout>
     );
 }
