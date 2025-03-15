@@ -29,7 +29,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/events', [EventController::class, 'index'])->name('event.index');
     Route::get('/events/create', [EventController::class, 'create'])->name('event.create');
     Route::post('/events', [EventController::class, 'store'])->name('event.store');
-    Route::get('/events/{id}', [EventController::class, 'show'])->name('event.show');
     Route::delete('/events/{id}', [EventController::class, 'destroy'])->name('event.destroy');
 
     // Rotas para Empresas
@@ -40,8 +39,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/companies/{id}', [CompanyController::class, 'destroy'])->name('company.destroy');
 
 });
-Route::get('/', [HomeController::class, 'index'])->name('home.index');
 
+Route::get('/', [HomeController::class, 'index'])->name('home.index');
+Route::get('/event/{id}', [EventController::class, 'show'])->name('event.show');
 
 
 
