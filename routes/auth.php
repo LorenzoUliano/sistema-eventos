@@ -10,6 +10,8 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\PromoterAuthenticatedSessionController;
+use App\Http\Controllers\Auth\PromoterRegisteredController;
 
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])
@@ -56,4 +58,14 @@ Route::middleware('auth')->group(function () {
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
+});
+
+
+
+
+Route::prefix('promoter')->middleware('auth:promoter')->group(function () {
+    Route::get('register', [PromoterRegisteredController::class, 'create'])->name('promoter.register');
+    Route::post('register', [PromoterRegisteredController::class, 'store']);
+    
+    Route::post('logout', [PromoterAuthenticatedSessionController::class, 'destroy'])->name('promoter.logout');
 });

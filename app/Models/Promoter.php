@@ -3,9 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class Promoter extends Model
+class Promoter extends Authenticatable
 {
     use HasFactory;
 
@@ -14,10 +14,13 @@ class Promoter extends Model
         'name',
         'email',
         'phone',
-        'password_hash',
+        'password',
     ];
 
-    // Relacionamento: um promoter pertence a uma empresa
+    protected $hidden = [
+        'password',
+    ];
+
     public function company()
     {
         return $this->belongsTo(Company::class);
