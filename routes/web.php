@@ -67,6 +67,15 @@ Route::prefix('promoter')->middleware('auth:promoter')->group(function () {
     Route::get('/list', [PromoterController::class, 'index'])->name('promoter.index');
     Route::get('/{id}', [PromoterController::class, 'show'])->name('promoter.show');
     Route::delete('/{id}', [PromoterController::class, 'destroy'])->name('promoter.destroy');
+
+    // Página para gerenciar evento específico
+    Route::get('/event/{id}', [EventController::class, 'manage'])->name('promoter.event.manage');
+
+    // Atualizar evento
+    Route::put('/event/{id}', [EventController::class, 'update'])->name('promoter.event.update');
+
+    // Logout do Promoter
+    Route::post('/logout', [PromoterAuthenticatedSessionController::class, 'destroy'])->name('promoter.logout');
 });
 
 

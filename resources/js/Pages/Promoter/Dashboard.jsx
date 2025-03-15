@@ -21,7 +21,7 @@ export default function Dashboard() {
                                 📍 {event.location}, {event.city} - {event.state}
                             </p>
                             <p className="text-gray-500">📅 {new Date(event.start_date).toLocaleDateString()}</p>
-                            <Link href={route("event.show", event.id)}>
+                            <Link href={route("promoter.event.manage", event.id)}>
                                 <Button className="mt-4 w-full">Gerenciar Evento</Button>
                             </Link>
                         </div>
