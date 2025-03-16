@@ -35,13 +35,13 @@ export default function Footer() {
                             <a href="https://facebook.com" target="_blank" className="hover:text-blue-400">
                                 <FaFacebook size={24} />
                             </a>
-                            <a href="https://instagram.com" target="_blank" className="hover:text-pink-400">
+                            <a href="https://instagram.com/lorenzouliano_" target="_blank" className="hover:text-pink-400">
                                 <FaInstagram size={24} />
                             </a>
-                            <a href="https://twitter.com" target="_blank" className="hover:text-blue-300">
+                            <a href="https://www.linkedin.com/in/lorenzo-uliano-128061208/" target="_blank" className="hover:text-blue-300">
                                 <FaTwitter size={24} />
                             </a>
-                            <a href="mailto:contato@evento.com" className="hover:text-gray-400">
+                            <a href="mailto:lorenzomettleruliano@gmail.com" className="hover:text-gray-400">
                                 <FaEnvelope size={24} />
                             </a>
                         </div>
