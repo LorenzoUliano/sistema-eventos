@@ -9,6 +9,11 @@ export default function Dashboard() {
     return (
         <PromoterLayout>
             <h1 className="text-2xl font-bold text-gray-800">Seus Eventos</h1>
+            <Link href={route("promoter.event.create")}>
+                <Button className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white">
+                    Criar Novo Evento
+                </Button>
+            </Link>
 
             {/* Lista de eventos */}
             {events.length > 0 ? (

@@ -27,16 +27,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/events', [EventController::class, 'index'])->name('event.index');
-    Route::get('/events/create', [EventController::class, 'create'])->name('event.create');
-    Route::post('/events', [EventController::class, 'store'])->name('event.store');
-    Route::delete('/events/{id}', [EventController::class, 'destroy'])->name('event.destroy');
-
-    // Rotas para Empresas
-    Route::get('/companies', [CompanyController::class, 'index'])->name('company.index');
-    Route::get('/companies/create', [CompanyController::class, 'create'])->name('company.create');
-    Route::post('/companies', [CompanyController::class, 'store'])->name('company.store');
-    Route::get('/companies/{id}', [CompanyController::class, 'show'])->name('company.show');
-    Route::delete('/companies/{id}', [CompanyController::class, 'destroy'])->name('company.destroy');
 
 });
 
@@ -69,9 +59,9 @@ Route::prefix('promoter')->middleware('auth:promoter')->group(function () {
     Route::delete('/{id}', [PromoterController::class, 'destroy'])->name('promoter.destroy');
 
     // Página para gerenciar evento específico
+    Route::get('/event/create', [EventController::class, 'create'])->name('promoter.event.create');
     Route::get('/event/{id}', [EventController::class, 'manage'])->name('promoter.event.manage');
-
-    // Atualizar evento
+    Route::post('/event/store', [EventController::class, 'store'])->name('promoter.event.store');
     Route::put('/event/{id}', [EventController::class, 'update'])->name('promoter.event.update');
 
     // Logout do Promoter
