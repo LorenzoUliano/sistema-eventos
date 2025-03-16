@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, usePage, router } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
+import Footer from "@/Components/Footer";
 
 export default function AuthenticatedLayout({ children }) {
     const { auth } = usePage().props;
@@ -139,7 +140,10 @@ export default function AuthenticatedLayout({ children }) {
             </nav>
 
             {/* Conteúdo principal */}
-            <div className="pt-20">{children}</div>
+            <div className="pt-[4rem]">{children}</div>
+
+
+            <Footer />
         </div>
     );
 }
