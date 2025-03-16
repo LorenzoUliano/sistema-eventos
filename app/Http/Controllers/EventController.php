@@ -18,7 +18,7 @@ class EventController extends Controller
 
     public function create()
     {
-        return Inertia::render('Promoter/EventCreate');
+        return Inertia::render('Promoter/EventForm');
     }
 
     public function store(Request $request)
@@ -71,21 +71,20 @@ class EventController extends Controller
         $promoter = Auth::guard('promoter')->user();
         $event = Event::where('company_id', $promoter->company_id)->where('id', $id)->with('company', 'tickets')->firstOrFail();
 
-        return Inertia::render('Promoter/EventManage', [
+        return Inertia::render('Promoter/EventForm', [
             'event' => $event,
         ]);
     }
 
-    // Método para atualizar os dados do evento
     public function update(Request $request, $id)
     {
         $promoter = Auth::guard('promoter')->user();
         $event = Event::where('company_id', $promoter->company_id)->where('id', $id)->firstOrFail();
-
+    
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'image_url' => 'nullable|url',
+            'image' => 'nullable|file|mimes:jpeg,png|max:2048',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'location' => 'required|string|max:255',
@@ -93,10 +92,22 @@ class EventController extends Controller
             'state' => 'required|string|max:2',
             'status' => 'required|in:active,inactive,canceled',
         ]);
-
-        $event->update($request->all());
-
-        return redirect()->route('promoter.dashboard', $event->id)->with('success', 'Evento atualizado com sucesso!');
+    
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->getRealPath();
+            $response = Http::withHeaders([
+                'Authorization' => 'Client-ID SEU_CLIENT_ID_DO_IMGUR',
+            ])->attach('image', file_get_contents($imagePath), $request->file('image')->getClientOriginalName())
+            ->post('https://api.imgur.com/3/upload');
+    
+            if ($response->successful()) {
+                $event->image_url = $response->json()['data']['link'];
+            }
+        }
+    
+        $event->update($request->except(['image']));
+    
+        return redirect()->route('promoter.dashboard')->with('success', 'Evento atualizado com sucesso!');
     }
 
     public function show($id)

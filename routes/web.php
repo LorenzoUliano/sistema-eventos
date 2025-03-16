@@ -60,8 +60,8 @@ Route::prefix('promoter')->middleware('auth:promoter')->group(function () {
 
     // Página para gerenciar evento específico
     Route::get('/event/create', [EventController::class, 'create'])->name('promoter.event.create');
-    Route::get('/event/{id}', [EventController::class, 'manage'])->name('promoter.event.manage');
     Route::post('/event/store', [EventController::class, 'store'])->name('promoter.event.store');
+    Route::get('/event/{id}', [EventController::class, 'manage'])->name('promoter.event.manage');
     Route::put('/event/{id}', [EventController::class, 'update'])->name('promoter.event.update');
 
     // Logout do Promoter
