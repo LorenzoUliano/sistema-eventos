@@ -20,7 +20,7 @@ export default function Home() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {events.map(event => (
                             <Card key={event.id} className="overflow-hidden shadow-lg rounded-lg bg-white transition-transform transform hover:scale-105">
-                                <img src={event.image_url} alt={event.name} className="w-full h-48 object-cover" />
+                                <img src={event.image_url} alt={event.name} className="w-full h-56 object-cover object-center" />
                                 <CardHeader className="p-4">
                                     <CardTitle className="text-xl font-semibold text-gray-900">{event.name}</CardTitle>
                                 </CardHeader>
