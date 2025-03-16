@@ -38,7 +38,7 @@ export default function EventDetails() {
                                 </CardHeader>
                                 <CardContent className="p-4 text-gray-700">
                                     <p><strong>💰 Preço:</strong> R$ {parseFloat(ticket.price).toFixed(2)}</p>
-                                    <p><strong>🎟️ Disponíveis:</strong> {ticket.limit}</p>
+                                    <p><strong>🎟️ Disponíveis:</strong> {ticket.limit_quantity}</p>
                                     <Button className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg">
                                         Comprar Ingresso
                                     </Button>
