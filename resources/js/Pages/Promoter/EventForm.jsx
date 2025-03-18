@@ -45,7 +45,7 @@ export default function EventForm({ event = null }) {
         });
 
         if (isEditing) {
-            put(route("promoter.event.update", { id: event.id }), {
+            post(route("promoter.event.update", { id: event.id }), {
                 data: formData,
                 headers: {
                     "Content-Type": "multipart/form-data",
@@ -72,7 +72,7 @@ export default function EventForm({ event = null }) {
 
                 {message && <p className="text-green-600 bg-green-100 p-2 rounded">{message}</p>}
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-4" encType="multipart/form-data">
                     <div>
                         <Label>Nome do Evento</Label>
                         <Input type="text" value={data.name} onChange={(e) => setData("name", e.target.value)} />

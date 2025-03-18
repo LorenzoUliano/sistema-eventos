@@ -62,7 +62,7 @@ Route::prefix('promoter')->middleware('auth:promoter')->group(function () {
     Route::get('/event/create', [EventController::class, 'create'])->name('promoter.event.create');
     Route::post('/event/store', [EventController::class, 'store'])->name('promoter.event.store');
     Route::get('/event/{id}', [EventController::class, 'manage'])->name('promoter.event.manage');
-    Route::put('/event/{id}', [EventController::class, 'update'])->name('promoter.event.update');
+    Route::post('/event/{id}', [EventController::class, 'update'])->name('promoter.event.update');
 
     // Logout do Promoter
     Route::post('/logout', [PromoterAuthenticatedSessionController::class, 'destroy'])->name('promoter.logout');
