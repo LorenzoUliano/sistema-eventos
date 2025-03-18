@@ -121,7 +121,7 @@ class EventController extends Controller
 
     public function destroy($id)
     {
-        Event::destroy($id);
+        Event::where('id', $id)->update(['status' => 'canceled']);
         return redirect()->route('event.index')->with('success', 'Evento excluído com sucesso!');
     }
 }
