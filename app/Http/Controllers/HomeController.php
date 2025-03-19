@@ -2,18 +2,38 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Event;
-use Illuminate\Http\Request;
+use App\Models\Company;
 use Inertia\Inertia;
 
 class HomeController extends Controller
 {
     public function index()
     {
-        $events = Event::where('status', 'active')->orderBy('start_date', 'asc')->get();
-        
+        // Carrega todas as empresas com até 3 eventos ativos, agrupados
+        $companies = Company::with(['events' => function ($query) {
+            $query->where('status', 'active')
+                ->orderBy('start_date', 'asc')
+                ->take(3); // Limita a 3 eventos por empresa
+        }])->get();
+
+
+        // Retorna as empresas com os eventos associados
         return Inertia::render('Home/Home', [
-            'events' => $events,
+            'companies' => $companies,
+        ]);
+    }
+
+    // Método para retornar até 20 eventos por empresa quando clicado no botão "Ver mais"
+    public function showCompanyEvents($companyId)
+    {
+        $company = Company::with(['events' => function ($query) {
+            $query->where('status', 'active')
+                ->orderBy('start_date', 'asc')
+                ->take(20); // Limita a 20 eventos por empresa
+        }])->findOrFail($companyId);
+
+        return Inertia::render('Company/Events', [
+            'company' => $company,
         ]);
     }
 }

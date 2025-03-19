@@ -12,7 +12,7 @@ class EventController extends Controller
 {
     public function index()
     {
-        $events = Event::all();
+        $events = Event::with('company')->get();
         return Inertia::render('Event/Event', ['events' => $events]);
     }
 
