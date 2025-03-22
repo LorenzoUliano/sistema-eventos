@@ -33,11 +33,26 @@ export default function Home() {
             <Head title="Eventos Disponíveis" />
 
             {/* Seção Hero */}
-            <div className="relative bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-20 text-center">
-                <h1 className="text-4xl font-extrabold">Descubra Eventos Incríveis Perto de Você</h1>
-                <p className="text-lg mt-2">Explore, participe e viva experiências únicas!</p>
-            </div>
+            <div className="relative overflow-hidden mb-10 min-h-[300px]">
+                {/* Fundo da imagem com filtro */}
+                <div
+                    className="absolute inset-0 bg-center bg-cover bg-no-repeat bg-fixed"
+                    style={{
+                        backgroundImage: `url('/fundo.jpg')`,
+                        filter: 'brightness(0.4) blur(2px)',
+                    }}
+                />
 
+                {/* Camada de conteúdo sobreposta */}
+                <div className="relative z-10 flex flex-col justify-center items-center h-full min-h-[300px] px-4 md:px-8 text-center bg-card/10 backdrop-blur-md border border-border shadow-md transition-colors">
+                    <h1 className="text-4xl md:text-5xl font-extrabold text-white">
+                        Descubra Eventos Incríveis Perto de Você
+                    </h1>
+                    <p className="mt-4 text-white/60 text-lg md:text-xl max-w-2xl">
+                        Explore, participe e viva experiências únicas com praticidade e segurança.
+                    </p>
+                </div>
+            </div>
             <div className="mt-10 p-6 max-w-7xl mx-auto">
                 {/* Card de Filtros */}
                 <Filtro 
@@ -50,14 +65,14 @@ export default function Home() {
 
                 {/* Exibindo empresas e seus eventos */}
                 {companies.map((company) => (
-                    <div key={company.id} className="mb-8 bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                    <div key={company.id} className="mb-8 bg-card p-6 rounded-lg shadow-md border border-border">
                         {/* Informações da Empresa */}
                         <div className="flex justify-between items-center mb-6">
                             <div>
-                                <h2 className="text-3xl font-bold text-gray-900">{company.name}</h2>
-                                <p className="text-gray-600">CNPJ: {company.cnpj}</p>
-                                <p className="text-gray-600">Contato: {company.phone}</p>
-                                <p className="text-gray-500">{company.email}</p>
+                                <h2 className="text-3xl font-bold text-primary">{company.name}</h2>
+                                <p className="text-primary">CNPJ: {company.cnpj}</p>
+                                <p className="text-primary">Contato: {company.phone}</p>
+                                <p className="text-primary">{company.email}</p>
                             </div>
                             <img
                                 src={`https://via.placeholder.com/150?text=${company.name[0]}`} // Placeholder para logo
@@ -67,7 +82,7 @@ export default function Home() {
                         </div>
 
                         {/* Separador entre informações e eventos */}
-                        <div className="border-b border-gray-300 mb-4"></div>
+                        <div className="border-b border-border mb-4"></div>
 
                         {/* Lista de eventos da empresa */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">

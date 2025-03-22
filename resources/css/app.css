@@ -28,12 +28,13 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --radius: 0.5rem
+    --radius: 0.5rem;
+    --shadow-color: 0 0% 0%;
   }
   .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
+    --background: 240 5% 12%;
+    --foreground: 0 0% 96%;
+    --card: 240 5% 14%;  
     --card-foreground: 0 0% 98%;
     --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
@@ -54,7 +55,8 @@
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%
+    --chart-5: 340 75% 55%;
+    --shadow-color: 0 0% 100%;
   }
 }
 
@@ -64,5 +66,21 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+
+@layer utilities {
+  .shadow-theme {
+    @apply shadow-lg;
+    box-shadow:
+      0 1px 3px 0 hsl(var(--shadow-color) / 0.1),
+      0 1px 2px -1px hsl(var(--shadow-color) / 0.1);
+  }
+
+  .dark .shadow-theme {
+    box-shadow:
+      0 1px 3px 0 hsl(0 0% 0% / 0.4),
+      0 1px 2px -1px hsl(0 0% 0% / 0.3);
   }
 }

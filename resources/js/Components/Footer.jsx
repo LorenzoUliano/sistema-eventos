@@ -4,7 +4,7 @@ import { FaFacebook, FaInstagram, FaTwitter, FaEnvelope } from "react-icons/fa";
 
 export default function Footer() {
     return (
-        <footer className="bg-gray-900 text-gray-300 py-10 mt-10">
+        <footer className="bg-card text-primary border-t shadow-lg border-border py-10 mt-10">
             <div className="max-w-7xl mx-auto px-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {/* Sobre o site */}

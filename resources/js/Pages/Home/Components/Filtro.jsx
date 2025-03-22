@@ -7,13 +7,13 @@ import { FaTimes } from "react-icons/fa";
 export default function Filtro({search, setSearch, location, setLocation, date, setDate, clearFilters}) {
 
     return (
-        <div className="bg-white shadow-lg rounded-lg p-6 mb-6 border border-gray-200">
-            <h2 className="text-xl font-bold mb-4">Filtrar Eventos</h2>
+        <div className="bg-card shadow-theme rounded-lg p-6 mb-6 border border-border">
+            <h2 className="text-xl font-bold mb-4 text-primary">Filtrar Eventos</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                    <Label className="pb-1">Nome do Evento</Label>
+                    <Label className="pb-1 !text-primary">Nome do Evento</Label>
                     <Input 
-                        type="text" 
+                        type="text !bg-foreground border border-card" 
                         value={search} 
                         onChange={(e) => setSearch(e.target.value)} 
                         placeholder="Buscar evento..."

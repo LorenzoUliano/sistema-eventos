@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, usePage, router } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
 import Footer from "@/Components/Footer";
+import { useDarkMode } from "@/Hooks/useDarkMode"; // ou o caminho que você colocou
 
 export default function AuthenticatedLayout({ children }) {
     const { auth } = usePage().props;
@@ -17,35 +18,38 @@ export default function AuthenticatedLayout({ children }) {
         }
     };
 
+    const [isDark, setIsDark] = useDarkMode();
+
+
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
             {/* Navbar */}
-            <nav className="bg-white shadow-md fixed w-full z-10">
+            <nav className="bg-card shadow-md fixed w-full z-20">
                 <div className="mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16 items-center">
                         <div className="flex items-center">
                             <Link href="/">
-                                <span className="text-xl font-bold text-gray-800">Painel</span>
+                                <span className="text-xl font-bold text-primary">Painel</span>
                             </Link>
                         </div>
 
                         {/* Menu Desktop */}
-                        <div className="hidden md:flex space-x-6">
+                        <div className="hidden md:flex items-center space-x-4">
                             {promoter ? (
                                 <>
-                                    <Link href={route("promoter.dashboard")} className="text-gray-700 hover:text-blue-600 font-medium">
+                                    <Link href={route("promoter.dashboard")} className="text-primary hover:text-blue-600 font-medium">
                                         Dashboard Promoter
                                     </Link>
-                                    <Link href={route("promoter.register")} className="text-gray-700 hover:text-blue-600 font-medium">
+                                    <Link href={route("promoter.register")} className="text-primary hover:text-blue-600 font-medium">
                                         Criar Promoter
                                     </Link>
                                 </>
                             ) : (
                                 <>
-                                    <Link href="/" className="text-gray-700 hover:text-blue-600 font-medium">
+                                    <Link href="/" className="text-primary hover:text-blue-600 font-medium">
                                         Home
                                     </Link>
-                                    <Link href="/events" className="text-gray-700 hover:text-blue-600 font-medium">
+                                    <Link href="/events" className="text-primary hover:text-blue-600 font-medium">
                                         Eventos
                                     </Link>
                                 </>
@@ -53,17 +57,24 @@ export default function AuthenticatedLayout({ children }) {
                         </div>
 
                         {/* Menu Desktop - Usuário ou Promoter */}
-                        <div className="hidden md:flex items-center">
+                        <div className="hidden md:flex items-center space-x-4">
+                            <button
+                                onClick={() => setIsDark(!isDark)}
+                                className="transition rounded-full p-2 border hover:bg-muted"
+                                title="Alternar tema"
+                            >
+                                {isDark ? "🌙" : "🌞"}
+                            </button>
                             {promoter ? (
                                 <>
-                                    <span className="text-gray-700 font-medium">Olá, {promoter.name}!</span>
+                                    <span className="text-primary font-medium">Olá, {promoter.name}!</span>
                                     <Button variant="outline" className="ml-4" onClick={logout}>
                                         Sair
                                     </Button>
                                 </>
                             ) : user ? (
                                 <>
-                                    <span className="text-gray-700 font-medium">Olá, {user.name}!</span>
+                                    <span className="text-primary font-medium">Olá, {user.name}!</span>
                                     <Button variant="outline" className="ml-4" onClick={logout}>
                                         Sair
                                     </Button>
@@ -79,7 +90,7 @@ export default function AuthenticatedLayout({ children }) {
                         <div className="md:hidden flex items-center">
                             <button
                                 onClick={() => setShowingNavigationDropdown(!showingNavigationDropdown)}
-                                className="text-gray-700 hover:text-gray-900 focus:outline-none"
+                                className="text-primary hover:text-gray-900 focus:outline-none"
                             >
                                 <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
@@ -91,23 +102,29 @@ export default function AuthenticatedLayout({ children }) {
 
                 {/* Dropdown Mobile */}
                 {showingNavigationDropdown && (
-                    <div className="md:hidden bg-white shadow-md absolute w-full">
+                    <div className="md:hidden bg-card shadow-md absolute w-full">
                         <div className="p-4 space-y-2">
+                            <button
+                                onClick={() => setIsDark(!isDark)}
+                                className="block w-full text-left text-primary hover:text-blue-600 font-medium"
+                            >
+                                Alternar para modo {isDark ? "claro ☀️" : "escuro 🌙"}
+                            </button>
                             {promoter ? (
                                 <>
-                                    <Link href={route("promoter.dashboard")} className="block text-gray-700 hover:text-blue-600 font-medium">
+                                    <Link href={route("promoter.dashboard")} className="block text-primary hover:text-blue-600 font-medium">
                                         Dashboard Promoter
                                     </Link>
-                                    <Link href={route("promoter.register")} className="block text-gray-700 hover:text-blue-600 font-medium">
+                                    <Link href={route("promoter.register")} className="block text-primary hover:text-blue-600 font-medium">
                                         Criar Promoter
                                     </Link>
                                 </>
                             ) : (
                                 <>
-                                    <Link href="/" className="block text-gray-700 hover:text-blue-600 font-medium">
+                                    <Link href="/" className="block text-primary hover:text-blue-600 font-medium">
                                         Home
                                     </Link>
-                                    <Link href="/events" className="block text-gray-700 hover:text-blue-600 font-medium">
+                                    <Link href="/events" className="block text-primary hover:text-blue-600 font-medium">
                                         Eventos
                                     </Link>
                                 </>
@@ -117,14 +134,14 @@ export default function AuthenticatedLayout({ children }) {
 
                             {promoter ? (
                                 <>
-                                    <span className="block text-gray-700 font-medium">Olá, {promoter.name}!</span>
+                                    <span className="block text-primary font-medium">Olá, {promoter.name}!</span>
                                     <button onClick={logout} className="block text-red-600 hover:text-red-800 font-medium w-full text-left">
                                         Sair
                                     </button>
                                 </>
                             ) : user ? (
                                 <>
-                                    <span className="block text-gray-700 font-medium">Olá, {user.name}!</span>
+                                    <span className="block text-primary font-medium">Olá, {user.name}!</span>
                                     <button onClick={logout} className="block text-red-600 hover:text-red-800 font-medium w-full text-left">
                                         Sair
                                     </button>
