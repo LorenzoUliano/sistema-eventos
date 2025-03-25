@@ -11,7 +11,7 @@ class CompanyController extends Controller
     public function index()
     {
         $companies = Company::all();
-        return Inertia::render('Company/Company', ['companies' => $companies]);
+        return Inertia::render('Companies/Companies', ['companies' => $companies]);
     }
 
     public function create()
@@ -35,8 +35,11 @@ class CompanyController extends Controller
 
     public function show($id)
     {
-        $company = Company::findOrFail($id);
-        return Inertia::render('CompanyShow/CompanyShow', ['company' => $company]);
+        $company = Company::with('events')->findOrFail($id);
+
+        return Inertia::render('Company/Company', [
+            'company' => $company,
+        ]);
     }
 
     public function destroy($id)

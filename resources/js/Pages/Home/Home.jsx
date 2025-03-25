@@ -55,7 +55,7 @@ export default function Home() {
             </div>
             <div className="mt-10 p-6 max-w-7xl mx-auto">
                 {/* Card de Filtros */}
-                <Filtro 
+                <Filtro
                     search={search}
                     setSearch={setSearch}
                     location={location}
@@ -98,7 +98,7 @@ export default function Home() {
                         {/* Botão "Ver mais" para carregar todos os eventos da empresa */}
                         {company.events.length === 3 && (
                             <div className="mt-4 text-center">
-                                <a href={`/company/${company.id}/events`}>
+                                <a href={`/company/${company.id}`}>
                                     <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded">
                                         Ver mais eventos
                                     </button>

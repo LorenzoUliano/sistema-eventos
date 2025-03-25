@@ -33,6 +33,8 @@ Route::middleware('auth')->group(function () {
 Route::get('/', [HomeController::class, 'index'])->name('home.index');
 Route::get('/event/{id}', [EventController::class, 'show'])->name('event.show');
 
+Route::get('/company/{id}', [CompanyController::class, 'show'])->name('company.show');
+
 
 
 // ROTAS PÚBLICAS - Login e Logout do Promoter
