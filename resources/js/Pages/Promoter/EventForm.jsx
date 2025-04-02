@@ -14,7 +14,7 @@ export default function EventForm({ event = null }) {
     const { data, setData, post, put, processing, errors } = useForm({
         name: event?.name || "",
         description: event?.description || "",
-        image: null, // Armazena o arquivo da imagem
+        image: null,
         start_date: event?.start_date || "",
         end_date: event?.end_date || "",
         location: event?.location || "",
@@ -45,11 +45,8 @@ export default function EventForm({ event = null }) {
         });
 
         if (isEditing) {
-            post(route("promoter.event.update", { id: event.id }), {
+            put(route("promoter.event.update", { id: event.id }), {
                 data: formData,
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
                 onSuccess: () => setMessage("Evento atualizado com sucesso!"),
             });
         } else {

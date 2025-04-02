@@ -8,7 +8,7 @@ export default function EventCard({ event, company }) {
 
     return (
         <Link href={`/event/${event.id}`} className="block">
-            <Card className="overflow-hidden shadow-lg rounded-lg bg-background transition-transform transform hover:scale-105 hover:shadow-xl cursor-pointer">
+            <Card className="overflow-hidden shadow-lg rounded-lg bg-backgroundb transition-transform transform hover:scale-105 hover:shadow-xl cursor-pointer">
                 <img
                     src={event.image_url}
                     alt={event.name}

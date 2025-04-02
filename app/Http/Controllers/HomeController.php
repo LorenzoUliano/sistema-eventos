@@ -9,11 +9,10 @@ class HomeController extends Controller
 {
     public function index()
     {
-        // Carrega todas as empresas com até 3 eventos ativos, agrupados
         $companies = Company::with(['events' => function ($query) {
             $query->where('status', 'active')
                 ->orderBy('start_date', 'asc')
-                ->take(3); // Limita a 3 eventos por empresa
+                ->take(3);
         }])->get();
 
 
