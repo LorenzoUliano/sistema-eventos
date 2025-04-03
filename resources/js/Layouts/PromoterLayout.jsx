@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, usePage, router } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
+import {useDarkMode} from "@/Hooks/useDarkMode.js";
 
 export default function PromoterLayout({ children }) {
     const { auth } = usePage().props;
@@ -12,32 +13,41 @@ export default function PromoterLayout({ children }) {
         router.post(route("promoter.logout"));
     };
 
+    const [isDark, setIsDark] = useDarkMode();
+
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-background">
             {/* Navbar */}
-            <nav className="bg-white shadow-md fixed w-full z-10">
+            <nav className=" shadow-md fixed w-full z-10">
                 <div className="mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16 items-center">
                         <div className="flex items-center">
                             <Link href="/">
-                                <span className="text-xl font-bold text-gray-800">Painel Promoter</span>
+                                <span className="text-xl font-bold text-primary">Painel Promoter</span>
                             </Link>
                         </div>
 
                         <div className="hidden md:flex space-x-6">
-                            <Link href={route("promoter.dashboard")} className="text-gray-700 hover:text-blue-600 font-medium">
+                            <Link href={route("promoter.dashboard")} className="text-primary hover:text-blue-600 font-medium">
                                 Dashboard
                             </Link>
-                            <Link href={route("promoter.register")} className="text-gray-700 hover:text-blue-600 font-medium">
+                            <Link href={route("promoter.register")} className="text-primary hover:text-blue-600 font-medium">
                                 Criar Promoter
                             </Link>
                         </div>
 
-                        <div className="hidden md:flex items-center">
+                        <div className="hidden md:flex items-center gap-2">
+                            <button
+                                onClick={() => setIsDark(!isDark)}
+                                className="transition rounded-full px-3 py-2 border hover:bg-muted"
+                                title="Alternar tema"
+                            >
+                                {isDark ? "🌙" : "🌞"}
+                            </button>
                             {promoter ? (
                                 <>
-                                    <span className="text-gray-700 font-medium">Olá, {promoter.name}!</span>
-                                    <Button variant="outline" className="ml-4" onClick={logout}>
+                                    <span className="text-primary font-medium">Olá, {promoter.name}!</span>
+                                    <Button variant="outline" className="ml-4 bg-card" onClick={logout}>
                                         Sair
                                     </Button>
                                 </>
@@ -52,7 +62,7 @@ export default function PromoterLayout({ children }) {
                         <div className="md:hidden flex items-center">
                             <button
                                 onClick={() => setShowingNavigationDropdown(!showingNavigationDropdown)}
-                                className="text-gray-700 hover:text-gray-900 focus:outline-none"
+                                className="text-primary hover:text-gray-900 focus:outline-none"
                             >
                                 <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
@@ -64,16 +74,22 @@ export default function PromoterLayout({ children }) {
 
                 {/* Dropdown Mobile */}
                 {showingNavigationDropdown && promoter && (
-                    <div className="md:hidden bg-white shadow-md absolute w-full">
+                    <div className="md:hidden bg-card shadow-md absolute w-full">
                         <div className="p-4 space-y-2">
-                            <Link href={route("promoter.dashboard")} className="block text-gray-700 hover:text-blue-600 font-medium">
+                            <button
+                                onClick={() => setIsDark(!isDark)}
+                                className="block w-full text-left text-primary hover:text-blue-600 font-medium"
+                            >
+                                Alternar para modo {isDark ? "claro ☀️" : "escuro 🌙"}
+                            </button>
+                            <Link href={route("promoter.dashboard")} className="block text-primary hover:text-blue-600 font-medium">
                                 Dashboard
                             </Link>
-                            <Link href={route("promoter.register")} className="block text-gray-700 hover:text-blue-600 font-medium">
+                            <Link href={route("promoter.register")} className="block text-primary hover:text-blue-600 font-medium">
                                 Criar Promoter
                             </Link>
                             <div className="border-t my-2"></div>
-                            <span className="block text-gray-700 font-medium">Olá, {promoter.name}!</span>
+                            <span className="block text-primary font-medium">Olá, {promoter.name}!</span>
                             <button onClick={logout} className="block text-red-600 hover:text-red-800 font-medium w-full text-left">
                                 Sair
                             </button>

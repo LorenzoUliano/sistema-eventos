@@ -13,7 +13,7 @@ class EventRepository
 
     public function find($id)
     {
-        return Event::findOrFail($id);
+        return Event::with('company')->with('tickets')->findOrFail($id);
     }
 
     public function create(array $data)

@@ -9,11 +9,21 @@ use Illuminate\Support\Facades\Http;
 
 class EventService
 {
-    protected $eventRepository;
+    protected EventRepository $eventRepository;
 
     public function __construct(EventRepository $eventRepository)
     {
         $this->eventRepository = $eventRepository;
+    }
+
+    public function getAll()
+    {
+        return $this->eventRepository->all();
+    }
+
+    public function findById(int $id)
+    {
+        return $this->eventRepository->find($id);
     }
 
     public function store(Request $request)
@@ -98,7 +108,6 @@ class EventService
     {
         $promoter = Auth::guard('promoter')->user();
 
-        // Recupera o evento, incluindo a verificação de que pertence à empresa do promotor
         return $this->eventRepository->findByCompany($id, $promoter->company_id);
     }
 }

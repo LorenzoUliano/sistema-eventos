@@ -8,7 +8,7 @@ use Inertia\Inertia;
 
 class EventController extends Controller
 {
-    protected $eventService;
+    protected EventService $eventService;
 
     public function __construct(EventService $eventService)
     {
@@ -46,7 +46,7 @@ class EventController extends Controller
 
     public function show($id)
     {
-        $event = $this->eventService->find($id);
+        $event = $this->eventService->findById($id);
         return Inertia::render('Event/Details', ['event' => $event]);
     }
 

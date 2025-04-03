@@ -5,7 +5,7 @@ import EventCard from "@/Components/EventCard";
 import Filtro from "./Components/Filtro";
 
 export default function Home() {
-    const { auth, companies } = usePage().props; // Alterado para receber os eventos agrupados
+    const { auth, companies } = usePage().props;
 
     const [search, setSearch] = useState("");
     const [location, setLocation] = useState("");
@@ -34,7 +34,6 @@ export default function Home() {
 
             {/* Seção Hero */}
             <div className="relative overflow-hidden mb-10 min-h-[300px]">
-                {/* Fundo da imagem com filtro */}
                 <div
                     className="absolute inset-0 bg-center bg-cover bg-no-repeat bg-fixed"
                     style={{
@@ -43,7 +42,6 @@ export default function Home() {
                     }}
                 />
 
-                {/* Camada de conteúdo sobreposta */}
                 <div className="relative z-10 flex flex-col justify-center items-center h-full min-h-[300px] px-4 md:px-8 text-center bg-card/10 backdrop-blur-md border border-border shadow-md transition-colors">
                     <h1 className="text-4xl md:text-5xl font-extrabold text-white">
                         Descubra Eventos Incríveis Perto de Você
@@ -53,6 +51,7 @@ export default function Home() {
                     </p>
                 </div>
             </div>
+
             <div className="mt-10 p-6 max-w-7xl mx-auto">
                 {/* Card de Filtros */}
                 <Filtro
@@ -65,8 +64,7 @@ export default function Home() {
 
                 {/* Exibindo empresas e seus eventos */}
                 {companies.map((company) => (
-                    <div key={company.id} className="mb-8 bg-card p-6 rounded-lg shadow-md border border-border">
-                        {/* Informações da Empresa */}
+                    <div key={company.id} className="mb-8 bg-card p-6 rounded-lg shadow-lg border border-border">
                         <div className="flex justify-between items-center mb-6">
                             <div>
                                 <h2 className="text-3xl font-bold text-primary">{company.name}</h2>
@@ -75,16 +73,14 @@ export default function Home() {
                                 <p className="text-primary">{company.email}</p>
                             </div>
                             <img
-                                src={`https://via.placeholder.com/150?text=${company.name[0]}`} // Placeholder para logo
+                                src={`https://via.placeholder.com/150?text=${company.name[0]}`}
                                 alt={company.name}
                                 className="h-20 w-20 object-cover rounded-full"
                             />
                         </div>
 
-                        {/* Separador entre informações e eventos */}
                         <div className="border-b border-border mb-4"></div>
 
-                        {/* Lista de eventos da empresa */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
                             {filteredEvents(company.events).length > 0 ? (
                                 filteredEvents(company.events).map((event) => (
@@ -95,11 +91,10 @@ export default function Home() {
                             )}
                         </div>
 
-                        {/* Botão "Ver mais" para carregar todos os eventos da empresa */}
                         {company.events.length === 3 && (
                             <div className="mt-4 text-center">
                                 <a href={`/company/${company.id}`}>
-                                    <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded">
+                                    <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-all duration-200 transform hover:scale-105">
                                         Ver mais eventos
                                     </button>
                                 </a>
