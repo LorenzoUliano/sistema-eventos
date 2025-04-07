@@ -11,6 +11,8 @@ use Inertia\Inertia;
 use App\Http\Controllers\Auth\PromoterAuthenticatedSessionController;
 use App\Http\Controllers\Auth\PromoterRegisteredController;
 use App\Http\Controllers\PromoterController;
+use App\Http\Controllers\TicketController;
+
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -65,6 +67,12 @@ Route::prefix('promoter')->middleware('auth:promoter')->group(function () {
     Route::post('/event/store', [EventController::class, 'store'])->name('promoter.event.store');
     Route::get('/event/{id}', [EventController::class, 'manage'])->name('promoter.event.manage');
     Route::put('/event/{id}', [EventController::class, 'update'])->name(name: 'promoter.event.update');
+
+    // TicketsEvento
+    Route::get('/event/{id}/tickets', [EventController::class, 'tickets'])->name('promoter.event.tickets');
+
+    Route::post('/events/{event}/tickets', [TicketController::class, 'store'])->name('promoter.tickets.store');
+    Route::delete('/events/{event}/tickets/{ticket}', [TicketController::class, 'destroy'])->name('promoter.tickets.destroy');
 
     // Logout do Promoter
     Route::post('/logout', [PromoterAuthenticatedSessionController::class, 'destroy'])->name('promoter.logout');

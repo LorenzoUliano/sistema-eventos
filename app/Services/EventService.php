@@ -110,4 +110,9 @@ class EventService
 
         return $this->eventRepository->findByCompany($id, $promoter->company_id);
     }
+
+
+    public function getTickets($id) {
+        return $this->eventRepository->findTickets($id);
+    }
 }

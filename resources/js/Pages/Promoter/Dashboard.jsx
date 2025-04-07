@@ -9,8 +9,7 @@ import { ptBR } from "date-fns/locale";
 
 export default function Dashboard() {
     const { events } = usePage().props;
-    console.log(events.length);
-    
+
     // Métricas rápidas
     const totalEvents = events.length;
     const activeEvents = events.filter(e => e.status === 'active').length;
@@ -35,19 +34,19 @@ export default function Dashboard() {
 
                 {/* Métricas */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <CardMetric 
+                    <CardMetric
                         icon={<Ticket className="w-6 h-6" />}
                         title="Eventos Ativos"
                         value={activeEvents}
                         color="text-green-500"
                     />
-                    <CardMetric 
+                    <CardMetric
                         icon={<Users className="w-6 h-6" />}
                         title="Total de Eventos"
                         value={totalEvents}
                         color="text-blue-500"
                     />
-                    <CardMetric 
+                    <CardMetric
                         icon={<DollarSign className="w-6 h-6" />}
                         title="Ingressos Disponíveis"
                         value={totalTickets}
@@ -58,7 +57,7 @@ export default function Dashboard() {
                 {/* Lista de Eventos */}
                 <div className="space-y-4">
                     <h2 className="text-2xl font-semibold text-primary">Seus Eventos</h2>
-                    
+
                     {events.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {events.map((event) => (
@@ -115,7 +114,7 @@ const EventCard = ({ event }) => {
                     {event.status === 'active' ? 'Ativo' : event.status === 'draft' ? 'Rascunho' : 'Cancelado'}
                 </Badge>
             </div>
-            
+
             <div className="p-6 space-y-4">
                 <div className="space-y-2">
                     <h3 className="text-lg font-semibold text-primary">{event.name}</h3>
@@ -137,7 +136,7 @@ const EventCard = ({ event }) => {
                     </div>
                 </div>
 
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-2">
                     <Badge variant="outline" className="gap-1">
                         <Ticket className="w-4 h-4" />
                         {event.tickets.length} tipos de ingressos
@@ -146,6 +145,12 @@ const EventCard = ({ event }) => {
                         <Button variant="outline" size="sm" className="gap-2">
                             <Settings className="w-4 h-4" />
                             Gerenciar
+                        </Button>
+                    </Link>
+                    <Link href={route("promoter.event.tickets", event.id)}>
+                        <Button variant={'outline'} size={"sm"} className={"gap-2"}>
+                            <Ticket className={"w-4 h-4"} />
+                            Gerenciar Ingressos
                         </Button>
                     </Link>
                 </div>

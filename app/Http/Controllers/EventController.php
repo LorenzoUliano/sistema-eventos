@@ -55,4 +55,10 @@ class EventController extends Controller
         $this->eventService->cancelEvent($id);
         return redirect()->route('event.index')->with('success', 'Evento excluído com sucesso!');
     }
+
+    public function tickets($id) {
+        $event = $this->eventService->getTickets($id);
+
+        return Inertia::render('Promoter/EventTickets', ['event' => $event]);
+    }
 }

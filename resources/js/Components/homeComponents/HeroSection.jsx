@@ -57,7 +57,7 @@ export const HeroSection = () => {
                             <Search className="w-5 h-5 text-muted-foreground" />
                             <Input
                                 placeholder="Pesquisar eventos, artistas ou locais..."
-                                className="border-0 text-lg h-14 focus-visible:ring-0 bg-transparent"
+                                className="!border-0 !shadow-0 text-lg h-14 focus-visible:ring-0 bg-transparent"
                             />
                         </div>
                     </div>

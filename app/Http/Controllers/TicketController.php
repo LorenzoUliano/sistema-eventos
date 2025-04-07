@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Event;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 
@@ -13,17 +14,23 @@ class TicketController extends Controller
         return response()->json($tickets);
     }
 
-    public function store(Request $request)
+    public function store(Request $request, Event $event)
     {
-        $request->validate([
-            'event_id' => 'required|exists:events,id',
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
-            'limit_quantity' => 'required|integer|min:1',
+            'limit_quantity' => 'required|integer|min:1'
         ]);
 
-        $ticket = Ticket::create($request->all());
-        return response()->json($ticket, 201);
+        $event->tickets()->create($validated);
+
+        return redirect()->back()->with('success', 'Ingresso criado com sucesso!');
+    }
+
+    public function destroy(Event $event, Ticket $ticket)
+    {
+        $ticket->delete();
+        return redirect()->back()->with('success', 'Ingresso excluído com sucesso!');
     }
 
     public function show($id)
@@ -32,9 +39,4 @@ class TicketController extends Controller
         return response()->json($ticket);
     }
 
-    public function destroy($id)
-    {
-        Ticket::destroy($id);
-        return response()->json(['message' => 'Ticket deleted']);
-    }
 }

@@ -38,4 +38,8 @@ class EventRepository
             ->firstOrFail();
     }
 
+    public function findTickets($id)
+    {
+        return Event::where('id', $id)->with('tickets')->firstOrFail();
+    }
 }
