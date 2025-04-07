@@ -1,31 +1,94 @@
-import React from "react";
-import { Link } from "@inertiajs/react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React from 'react';
+import { Card } from '@/Components/ui/card';
+import { Link } from '@inertiajs/react';
+import { MotionDiv } from '@/Components/Motion';
+import { Badge } from '@/Components/ui/badge';
+import { MapPin, Ticket, DollarSign, CalendarDays, Building } from 'lucide-react';
 
-export default function EventCard({ event, company }) {
+export const EventCard = ({ event, company }) => {
+    const cardVariants = {
+        hidden: { opacity: 0, scale: 0.95 },
+        visible: { opacity: 1, scale: 1 },
+    };
+
+    const hasTickets = event.tickets?.length > 0;
+
+    const priceRange = hasTickets
+        ? event.tickets.reduce((acc, ticket) => ({
+            min: Math.min(acc.min, ticket.price),
+            max: Math.max(acc.max, ticket.price)
+        }), { min: Infinity, max: -Infinity })
+        : null;
+
+    const eventDate = new Date(event.start_date);
+
     return (
-        <Link href={`/event/${event.id}`} className="block">
-            <Card className="overflow-hidden shadow-lg rounded-lg bg-backgroundb transition-transform transform hover:scale-105 hover:shadow-xl cursor-pointer">
-                <img
-                    src={event.image_url}
-                    alt={event.name}
-                    className="w-full h-56 object-cover object-center"
-                />
-                <CardHeader className="px-4 py-2">
-                    <CardTitle className="text-xl font-semibold text-primary">{event.name}</CardTitle>
-                </CardHeader>
-                <CardContent className="px-4 py-2 text-primary">
-                    <p><strong>📅 Data:</strong> {new Date(event.start_date).toLocaleDateString()}</p>
-                    <p><strong>📍 Local:</strong> {event.location}, {event.city} - {event.state}</p>
-                    <p className="mt-2">{event.description}</p>
+        <MotionDiv
+            variants={cardVariants}
+            initial="hidden"
+            animate="visible"
+            transition={{ duration: 0.3 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+        >
+            <Link href={`/event/${event.id}`}>
+                <Card className="group relative overflow-hidden rounded-xl shadow-theme hover:shadow-theme-lg transition-all">
+                    <div className="relative aspect-video overflow-hidden">
+                        <img
+                            src={event.image_url}
+                            alt={event.name}
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
 
-                    <div className="mt-2">
-                        <p><strong>Empresa:</strong> {company.name}</p>
-                        <p><strong>CNPJ:</strong> {company.cnpj}</p>
-                        <p><strong>Contato:</strong> {company.phone}</p>
+                        <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
+
+                        <div className="absolute bottom-0 left-0 right-0 p-4 flex justify-between items-center">
+                            <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm flex items-center gap-1">
+                                <CalendarDays className="w-4 h-4" />
+                                {eventDate.toLocaleDateString('pt-BR', {
+                                    weekday: 'short',
+                                    month: 'short',
+                                    day: 'numeric'
+                                }).replace(/\./g, '')}
+                            </Badge>
+                            {hasTickets && (
+                                <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm">
+                                    {event.tickets.length} ingressos
+                                </Badge>
+                            )}
+                        </div>
                     </div>
-                </CardContent>
-            </Card>
-        </Link>
+
+                    <div className="p-6 space-y-4">
+                        <h3 className="text-xl font-bold text-primary leading-tight">
+                            {event.name}
+                        </h3>
+
+                        <div className="flex flex-wrap gap-2">
+                            <Badge variant="outline" className="border-primary/20 text-primary">
+                                <MapPin className="w-4 h-4 mr-1" />
+                                {event.city} - {event.state}
+                            </Badge>
+
+                            {priceRange?.min !== Infinity && (
+                                <Badge variant="outline" className="border-primary/20 text-primary">
+                                    <DollarSign className="w-4 h-4 mr-1" />
+                                    R$ {priceRange?.min.toFixed(2)} - {priceRange?.max.toFixed(2)}
+                                </Badge>
+                            )}
+                        </div>
+
+                        <p className="text-muted-foreground line-clamp-3 text-sm leading-relaxed">
+                            {event.description}
+                        </p>
+
+                        <div className="flex items-center gap-2 text-sm text-primary/80">
+                            <Building className="w-4 h-4" />
+                            <span className="font-medium">{company.name}</span>
+                        </div>
+                    </div>
+                </Card>
+            </Link>
+        </MotionDiv>
     );
-}
+};

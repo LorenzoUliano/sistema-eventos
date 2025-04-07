@@ -9,7 +9,8 @@ class HomeService
     public function getCompaniesWithEvents()
     {
         return Company::with(['events' => function ($query) {
-            $query->where('status', 'active')
+            $query->with('tickets')
+                ->where('status', 'active')
                 ->orderBy('start_date', 'asc')
                 ->take(3);
         }])->get();

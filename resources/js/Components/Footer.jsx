@@ -11,7 +11,7 @@ export default function Footer() {
                     <div>
                         <h2 className="text-lg font-bold text-white">Sobre Nós</h2>
                         <p className="text-sm mt-2">
-                            O melhor lugar para encontrar e participar dos eventos mais incríveis! 
+                            O melhor lugar para encontrar e participar dos eventos mais incríveis!
                             Fique por dentro das novidades e garanta seu ingresso.
                         </p>
                     </div>
@@ -25,6 +25,7 @@ export default function Footer() {
                             <li><Link href="/about" className="hover:text-blue-400">Sobre</Link></li>
                             <li><Link href="/contact" className="hover:text-blue-400">Contato</Link></li>
                             <li><Link href="/privacy-policy" className="hover:text-blue-400">Política de Privacidade</Link></li>
+                            <li><Link href="/promoter/login" className="hover:text-blue-400">Sou promotor</Link></li>
                         </ul>
                     </div>
 

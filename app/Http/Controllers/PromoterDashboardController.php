@@ -14,7 +14,7 @@ class PromoterDashboardController extends Controller
         $promoter = Auth::guard('promoter')->user();
 
         // Buscar eventos da empresa do promoter
-        $events = Event::where('company_id', $promoter->company_id)->get();
+        $events = Event::with('tickets')->where('company_id', $promoter->company_id)->get();
 
         return Inertia::render('Promoter/Dashboard', [
             'promoter' => $promoter,

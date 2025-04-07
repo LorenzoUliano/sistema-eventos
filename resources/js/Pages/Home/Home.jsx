@@ -1,107 +1,81 @@
 import React, { useState } from "react";
 import { Head, usePage } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import EventCard from "@/Components/EventCard";
-import Filtro from "./Components/Filtro";
+import { HeroSection } from "@/Components/homeComponents/HeroSection";
+import { EventFilters } from "@/Components/homeComponents/EventFilters";
+import { CompanyCard } from "@/Components/homeComponents/CompanyCard";
+import { EventCard } from "@/Components/EventCard";
 
 export default function Home() {
-    const { auth, companies } = usePage().props;
-
+    const { companies } = usePage().props;
     const [search, setSearch] = useState("");
     const [location, setLocation] = useState("");
     const [date, setDate] = useState("");
 
-    const clearFilters = () => {
-        setSearch("");
-        setLocation("");
-        setDate("");
-    };
+    const filteredEvents = (events) => events.filter(event => {
+        const matchesSearch = event.name.toLowerCase().includes(search.toLowerCase());
+        const matchesLocation = event.city.toLowerCase().includes(location.toLowerCase());
+        
+        // Converter datas para comparar apenas o dia
+        const eventDate = new Date(event.start_date);
+        const selectedDate = date ? new Date(date) : null;
+        
+        // Formatar datas para YYYY-MM-DD para comparação
+        const eventDateStr = eventDate.toISOString().split('T')[0];
+        const selectedDateStr = selectedDate?.toISOString().split('T')[0];
+        
+        const matchesDate = !date || eventDateStr === selectedDateStr;
+    
+        return matchesSearch && matchesLocation && matchesDate;
+    });
 
-    // Função para filtrar eventos
-    const filteredEvents = (events) => {
-        return events.filter(event => {
-            return (
-                (search === "" || event.name.toLowerCase().includes(search.toLowerCase())) &&
-                (location === "" || event.city.toLowerCase().includes(location.toLowerCase())) &&
-                (date === "" || event.start_date.startsWith(date))
-            );
-        });
-    };
 
+    console.log(date);
+    
     return (
         <AuthenticatedLayout>
-            <Head title="Eventos Disponíveis" />
-
-            {/* Seção Hero */}
-            <div className="relative overflow-hidden mb-10 min-h-[300px]">
-                <div
-                    className="absolute inset-0 bg-center bg-cover bg-no-repeat bg-fixed"
-                    style={{
-                        backgroundImage: `url('/fundo.jpg')`,
-                        filter: 'brightness(0.4) blur(2px)',
-                    }}
-                />
-
-                <div className="relative z-10 flex flex-col justify-center items-center h-full min-h-[300px] px-4 md:px-8 text-center bg-card/10 backdrop-blur-md border border-border shadow-md transition-colors">
-                    <h1 className="text-4xl md:text-5xl font-extrabold text-white">
-                        Descubra Eventos Incríveis Perto de Você
-                    </h1>
-                    <p className="mt-4 text-white/60 text-lg md:text-xl max-w-2xl">
-                        Explore, participe e viva experiências únicas com praticidade e segurança.
-                    </p>
-                </div>
-            </div>
-
-            <div className="mt-10 p-6 max-w-7xl mx-auto">
-                {/* Card de Filtros */}
-                <Filtro
+            <Head title="Eventos Incríveis" />
+            
+            <HeroSection />
+            
+            <div className="container m-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 space-y-12">
+                <EventFilters
                     search={search}
                     setSearch={setSearch}
                     location={location}
                     setLocation={setLocation}
-                    clearFilters={clearFilters}
+                    date={date}
+                    setDate={setDate}
+                    clearFilters={() => {
+                        setSearch("");
+                        setLocation("");
+                        setDate("");
+                    }}
                 />
 
-                {/* Exibindo empresas e seus eventos */}
-                {companies.map((company) => (
-                    <div key={company.id} className="mb-8 bg-card p-6 rounded-lg shadow-lg border border-border">
-                        <div className="flex justify-between items-center mb-6">
-                            <div>
-                                <h2 className="text-3xl font-bold text-primary">{company.name}</h2>
-                                <p className="text-primary">CNPJ: {company.cnpj}</p>
-                                <p className="text-primary">Contato: {company.phone}</p>
-                                <p className="text-primary">{company.email}</p>
+                <div className="space-y-16">
+                    {companies.map((company) => (
+                        <CompanyCard key={company.id} company={company}>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {filteredEvents(company.events).map(event => (
+                                    <EventCard
+                                        key={event.id} 
+                                        event={event} 
+                                        company={company} 
+                                    />
+                                ))}
+                                
+                                {filteredEvents(company.events).length === 0 && (
+                                    <div className="col-span-full text-center py-12">
+                                        <p className="text-muted-foreground text-lg">
+                                            Nenhum evento encontrado para os filtros selecionados
+                                        </p>
+                                    </div>
+                                )}
                             </div>
-                            <img
-                                src={`https://via.placeholder.com/150?text=${company.name[0]}`}
-                                alt={company.name}
-                                className="h-20 w-20 object-cover rounded-full"
-                            />
-                        </div>
-
-                        <div className="border-b border-border mb-4"></div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
-                            {filteredEvents(company.events).length > 0 ? (
-                                filteredEvents(company.events).map((event) => (
-                                    <EventCard key={event.id} event={event} company={company} />
-                                ))
-                            ) : (
-                                <p className="text-center text-gray-600 mt-10">Nenhum evento encontrado para esta empresa.</p>
-                            )}
-                        </div>
-
-                        {company.events.length === 3 && (
-                            <div className="mt-4 text-center">
-                                <a href={`/company/${company.id}`}>
-                                    <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-all duration-200 transform hover:scale-105">
-                                        Ver mais eventos
-                                    </button>
-                                </a>
-                            </div>
-                        )}
-                    </div>
-                ))}
+                        </CompanyCard>
+                    ))}
+                </div>
             </div>
         </AuthenticatedLayout>
     );
