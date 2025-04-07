@@ -1,25 +1,19 @@
-import ApplicationLogo from '@/Components/ApplicationLogo';
-import { Link } from '@inertiajs/react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+
+import { Card, CardHeader } from '@/components/ui/card';
+import { Lock } from 'lucide-react';
 
 export default function GuestLayout({ children }) {
     return (
-        <div className="flex min-h-screen flex-col justify-center items-center bg-gray-100 px-4">
-            {/* Logo */}
-            <div className="mb-6">
-                <Link href="/">
-                    <ApplicationLogo className="h-16 w-16 text-gray-600" />
-                </Link>
-            </div>
-
-            {/* Card de autenticação */}
-            <Card className="w-full max-w-md shadow-lg">
-                <CardHeader className="text-center">
-                    <h2 className="text-2xl font-semibold text-gray-800">Bem-vindo</h2>
-                </CardHeader>
-                <CardContent>
+        <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-primary/5 to-primary/10 p-4">
+            <Card className="w-1/2 max-w-md shadow-xl rounded-2xl border-0">
+                <CardHeader className="text-center space-y-1">
+                    <div className="mb-2 flex justify-center">
+                        <div className="bg-primary p-3 rounded-full">
+                            <Lock className="w-8 h-8 text-white" />
+                        </div>
+                    </div>
                     {children}
-                </CardContent>
+                </CardHeader>
             </Card>
         </div>
     );
