@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\EventService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -26,10 +27,10 @@ class EventController extends Controller
         return Inertia::render('Promoter/EventForm');
     }
 
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         $this->eventService->store($request);
-        return redirect()->route('promoter.dashboard')->with('success', 'Evento criado com sucesso!');
+        return to_route('promoter.dashboard')->with('success', 'Evento criado com sucesso!');
     }
 
     public function manage($id)

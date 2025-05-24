@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Event;
 use App\Repositories\EventRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,7 +27,7 @@ class EventService
         return $this->eventRepository->find($id);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): Event
     {
         $promoter = Auth::guard('promoter')->user();
 

@@ -4,6 +4,7 @@ import { usePage } from "@inertiajs/react";
 import { EventHeader } from "@/Components/eventComponents/EventHeader";
 import { EventDetailsCard } from "@/Components/eventComponents/EventDetailsCard";
 import { TicketCard } from "@/Components/eventComponents/TicketCard";
+import { CartSummary } from "@/Components/CartSummary";
 
 
 export default function EventDetails() {
@@ -15,9 +16,6 @@ export default function EventDetails() {
                 <EventHeader event={event} />
 
                 <EventDetailsCard event={event} />
-
-                {/* Seção de Galeria (opcional) */}
-                {/* <EventGallery images={[event.image_url]} /> */}
 
                 <section className="space-y-6">
                     <h2 className="text-3xl font-bold text-primary">Ingressos Disponíveis</h2>
@@ -35,6 +33,7 @@ export default function EventDetails() {
                         </div>
                     )}
                 </section>
+                <CartSummary eventId={event.id} />
             </div>
         </AuthenticatedLayout>
     );

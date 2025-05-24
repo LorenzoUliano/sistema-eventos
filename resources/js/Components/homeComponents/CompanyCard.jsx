@@ -11,16 +11,16 @@ export const CompanyCard = ({ company, children }) => (
             {/* Logo Section */}
             <div className="flex flex-col items-start gap-4">
                 <div className="relative group">
-                    <div className="w-32 h-32 rounded-xl overflow-hidden border-2 border-primary/20 transition-all duration-300 group-hover:border-primary">
-                        <img
-                            src={company.logo_url}
-                            alt={company.name}
-                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                        />
-                    </div>
-                    <Badge className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-primary/90 backdrop-blur">
-                        CNPJ: {company.cnpj}
-                    </Badge>
+                    {/*<div className="w-32 h-32 rounded-xl overflow-hidden border-2 border-primary/20 transition-all duration-300 group-hover:border-primary">*/}
+                    {/*    <img*/}
+                    {/*        src={company.logo_url}*/}
+                    {/*        alt={company.name}*/}
+                    {/*        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"*/}
+                    {/*    />*/}
+                    {/*</div>*/}
+                    {/*<Badge className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-primary/90 backdrop-blur">*/}
+                    {/*    CNPJ: {company.cnpj}*/}
+                    {/*</Badge>*/}
                 </div>
             </div>
 
