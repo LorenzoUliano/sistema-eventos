@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/collapsible";
 
 export const CartSummary = ({ eventId }) => {
-    const { cartItems, getEventTotal, clearCart } = useCart();
+    const { cartItems, getEventTotal, clearCart, handleContinueCart } = useCart();
     const [isOpen, setIsOpen] = useState(false);
 
     const eventItems = cartItems.filter((item) => item.event_id === eventId);
@@ -67,7 +67,7 @@ export const CartSummary = ({ eventId }) => {
                                     R$ {total.toFixed(2)}
                                 </p>
                             </div>
-                            <Button size="sm">Continuar</Button>
+                            <Button size="sm" onClick={handleContinueCart}>Continuar</Button>
                         </div>
 
                         

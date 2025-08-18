@@ -30,9 +30,16 @@ export default function EventForm({ event = null }) {
         status: event?.status || "active",
     });
 
-    const handleDateChange = (date, field) => {
-        setData(field, date);
-    };
+    
+const handleDateChange = (date, field) => {
+    if (date) {
+        // Formata para MySQL DATETIME
+        const formattedDate = format(date, "yyyy-MM-dd HH:mm:ss");
+        setData(field, formattedDate);
+    } else {
+        setData(field, null);
+    }
+};
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];

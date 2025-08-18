@@ -83,7 +83,7 @@ export const TicketCard = ({ ticket }) => {
                         size="lg"
                         onClick={handleBuy}
                     >
-                        Comprar Ingresso
+                        Adicionar ao carrinho
                     </Button>
                 )}
             </div>

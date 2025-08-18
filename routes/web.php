@@ -10,6 +10,7 @@ use App\Http\Controllers\PromoterDashboardController;
 use Inertia\Inertia;
 use App\Http\Controllers\Auth\PromoterAuthenticatedSessionController;
 use App\Http\Controllers\Auth\PromoterRegisteredController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\PromoterController;
 use App\Http\Controllers\TicketController;
 
@@ -29,6 +30,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/events', [EventController::class, 'index'])->name('event.index');
+
+    Route::post('/cart/continue', [CartController::class, 'addToCart']);
 
 });
 
