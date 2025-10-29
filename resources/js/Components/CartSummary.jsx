@@ -52,8 +52,8 @@ export const CartSummary = ({ eventId }) => {
                         </CollapsibleTrigger>
 
                         <div className="flex items-center gap-4">
-                            <Button 
-                                variant="outline" 
+                            <Button
+                                variant="outline"
                                 size="sm"
                                 onClick={() => clearCart()}
                             >
@@ -70,7 +70,7 @@ export const CartSummary = ({ eventId }) => {
                             <Button size="sm" onClick={handleContinueCart}>Continuar</Button>
                         </div>
 
-                        
+
                     </div>
 
                     <CollapsibleContent>

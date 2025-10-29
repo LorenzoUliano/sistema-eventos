@@ -13,6 +13,7 @@ use App\Http\Controllers\Auth\PromoterRegisteredController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\PromoterController;
 use App\Http\Controllers\TicketController;
+use \App\Http\Controllers\PurchaseController;
 
 
 Route::get('/', function () {
@@ -32,6 +33,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/events', [EventController::class, 'index'])->name('event.index');
 
     Route::post('/cart/continue', [CartController::class, 'addToCart']);
+
+    Route::get('/{eventId}/purchase', [PurchaseController::class, 'index'])->name('purchase.index');
 
 });
 
@@ -79,6 +82,7 @@ Route::prefix('promoter')->middleware('auth:promoter')->group(function () {
 
     // Logout do Promoter
     Route::post('/logout', [PromoterAuthenticatedSessionController::class, 'destroy'])->name('promoter.logout');
+
 });
 
 
