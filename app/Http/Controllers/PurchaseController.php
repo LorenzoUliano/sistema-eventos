@@ -33,10 +33,12 @@ class PurchaseController extends Controller
             ], 400);
         }
 
+        $paymentForms = $event->paymentForms()->get();
 
         return Inertia::render('Purchase/Purchase', [
             'tickets' => $tickets,
             'event' => $event,
+            'paymentForms' => $paymentForms
         ]);
     }
 

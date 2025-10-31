@@ -33,4 +33,14 @@ class Event extends Model
     {
         return $this->hasMany(Ticket::class);
     }
+
+    public function paymentForms()
+    {
+        return $this->belongsToMany(
+            PaymentForms::class,
+            'event_payment_forms',
+            'event_id',
+            'payment_form_id'
+        )->where('payment_forms.active', 1);
+    }
 }
