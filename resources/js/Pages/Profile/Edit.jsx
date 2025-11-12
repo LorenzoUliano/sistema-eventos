@@ -1,45 +1,68 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
-import DeleteUserForm from './Partials/DeleteUserForm';
-import UpdatePasswordForm from './Partials/UpdatePasswordForm';
-import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
+import { Head, Link } from '@inertiajs/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import { ArrowLeft } from 'lucide-react';
+import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
+import UpdatePasswordForm from './Partials/UpdatePasswordForm';
+import DeleteUserForm from './Partials/DeleteUserForm';
+import ProfileSidebar from './ProfileSidebar';
 
-export default function Edit({ mustVerifyEmail, status }) {
+export default function ProfileEdit({ mustVerifyEmail, status }) {
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const activeKey = 'profile';
+
     return (
-        <AuthenticatedLayout
-            header={<h2 className="text-2xl font-bold text-gray-900">Perfil</h2>}
-        >
-            <Head title="Perfil" />
+        <AuthenticatedLayout>
+            <Head title="Editar Perfil" />
+            <div className="container mx-auto px-4 py-8 max-w-7xl">
+                <div className="flex flex-col lg:flex-row gap-8">
+                    {/* Menu Lateral */}
+                    <ProfileSidebar 
+                        activeKey={activeKey}
+                        isMobileMenuOpen={isMobileMenuOpen}
+                        setIsMobileMenuOpen={setIsMobileMenuOpen}
+                    />
 
-            <div className="py-12">
-                <div className="mx-auto max-w-5xl space-y-6 sm:px-6 lg:px-8">
-                    <Card className="shadow-lg">
-                        <CardHeader>
-                            <CardTitle>Informações do Perfil</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <UpdateProfileInformationForm mustVerifyEmail={mustVerifyEmail} status={status} />
-                        </CardContent>
-                    </Card>
+                    {/* Conteúdo Principal */}
+                    <main className="flex-1 min-w-0 space-y-6">
+                        <div className="mb-4">
+                            <Link href="/profile">
+                                <Button variant="ghost" size="sm">
+                                    <ArrowLeft className="w-4 h-4 mr-2" />
+                                    Voltar
+                                </Button>
+                            </Link>
+                        </div>
 
-                    <Card className="shadow-lg">
-                        <CardHeader>
-                            <CardTitle>Alterar Senha</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <UpdatePasswordForm />
-                        </CardContent>
-                    </Card>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Informações do Perfil</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <UpdateProfileInformationForm mustVerifyEmail={mustVerifyEmail} status={status} />
+                            </CardContent>
+                        </Card>
 
-                    <Card className="shadow-lg border-red-500">
-                        <CardHeader>
-                            <CardTitle className="text-red-600">Excluir Conta</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <DeleteUserForm />
-                        </CardContent>
-                    </Card>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Alterar Senha</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <UpdatePasswordForm />
+                            </CardContent>
+                        </Card>
+
+                        <Card className="border-destructive">
+                            <CardHeader>
+                                <CardTitle className="text-destructive">Excluir Conta</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <DeleteUserForm />
+                            </CardContent>
+                        </Card>
+                    </main>
                 </div>
             </div>
         </AuthenticatedLayout>

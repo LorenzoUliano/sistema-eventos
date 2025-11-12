@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Order extends Model
 {
@@ -26,5 +27,13 @@ class Order extends Model
         return $this->belongsToMany(Ticket::class, 'order_tickets')
                     ->withPivot('quantity', 'total_price')
                     ->withTimestamps();
+    }
+
+    public static function userOrders()
+    {
+        return self::where('user_id', Auth::user()->id)
+            ->with(['tickets.event.company'])
+            ->orderBy('created_at', 'desc')
+            ->get();
     }
 }

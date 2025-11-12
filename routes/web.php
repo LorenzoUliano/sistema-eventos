@@ -11,6 +11,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\Auth\PromoterAuthenticatedSessionController;
 use App\Http\Controllers\Auth\PromoterRegisteredController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PromoterController;
 use App\Http\Controllers\TicketController;
 use \App\Http\Controllers\PurchaseController;
@@ -26,7 +27,12 @@ Route::get('/', function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    // Profile routes
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('/profile/orders', [ProfileController::class, 'orders'])->name('profile.orders');
+    Route::get('/profile/qrcodes', [ProfileController::class, 'qrcodes'])->name('profile.qrcodes');
+    Route::get('/profile/support', [ProfileController::class, 'support'])->name('profile.support');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
@@ -35,6 +41,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/cart/continue', [CartController::class, 'addToCart']);
 
     Route::get('/{eventId}/purchase', [PurchaseController::class, 'index'])->name('purchase.index');
+
+    Route::get('/orders', [OrderController::class, 'index'])->name('order.index');
+    Route::get('/orders/{id}', [OrderController::class, 'show'])->name('order.show');
+    Route::delete('/orders/{id}', [OrderController::class, 'destroy'])->name('order.destroy');
 
 });
 

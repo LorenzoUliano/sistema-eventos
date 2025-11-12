@@ -44,6 +44,7 @@ export default function Navbar({ layoutType = 'default', auth }) {
         }
     ];
 
+
     return (
         <nav className="bg-card/50 backdrop-blur-lg border-b border-border/50 fixed w-full z-50 shadow-theme">
             <div className="mx-auto px-4 sm:px-6 lg:px-8">
@@ -85,12 +86,12 @@ export default function Navbar({ layoutType = 'default', auth }) {
 
                         {(promoter || user) ? (
                             <div className="flex items-center gap-4">
-                                <div className="flex items-center gap-2 text-primary">
+                                <Link href={user && !isPromoterLayout ? "/profile" : "#"} className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors cursor-pointer">
                                     <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
                                         <User className="w-4 h-4" />
                                     </div>
                                     <span className="font-medium">{(promoter || user).name}</span>
-                                </div>
+                                </Link>
                                 <Button
                                     variant="outline"
                                     onClick={logout}
@@ -143,15 +144,31 @@ export default function Navbar({ layoutType = 'default', auth }) {
                             <div className="border-t border-border/50 pt-4">
                                 {(promoter || user) ? (
                                     <div className="space-y-4">
-                                        <div className="flex items-center gap-3 px-4">
-                                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                                                <User className="w-4 h-4 text-primary" />
+                                        {user && !isPromoterLayout ? (
+                                            <Link
+                                                href="/profile"
+                                                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/5 transition-colors"
+                                                onClick={() => setIsMenuOpen(false)}
+                                            >
+                                                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                                                    <User className="w-4 h-4 text-primary" />
+                                                </div>
+                                                <div>
+                                                    <p className="font-medium text-primary">{user.name}</p>
+                                                    <p className="text-sm text-primary/60">Perfil Usuário</p>
+                                                </div>
+                                            </Link>
+                                        ) : (
+                                            <div className="flex items-center gap-3 px-4">
+                                                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                                                    <User className="w-4 h-4 text-primary" />
+                                                </div>
+                                                <div>
+                                                    <p className="font-medium text-primary">{(promoter || user).name}</p>
+                                                    <p className="text-sm text-primary/60">Perfil {isPromoterLayout ? 'Promoter' : 'Usuário'}</p>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <p className="font-medium text-primary">{(promoter || user).name}</p>
-                                                <p className="text-sm text-primary/60">Perfil {isPromoterLayout ? 'Promoter' : 'Usuário'}</p>
-                                            </div>
-                                        </div>
+                                        )}
                                         <Button
                                             onClick={logout}
                                             variant="destructive"
