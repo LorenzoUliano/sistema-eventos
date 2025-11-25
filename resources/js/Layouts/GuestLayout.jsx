@@ -9,7 +9,7 @@ export default function GuestLayout({ children }) {
                 <CardHeader className="text-center space-y-1">
                     <div className="mb-2 flex justify-center">
                         <div className="bg-primary p-3 rounded-full">
-                            <Lock className="w-8 h-8 text-white" />
+                            <Lock className="w-8 h-8 text-secondary" />
                         </div>
                     </div>
                     {children}

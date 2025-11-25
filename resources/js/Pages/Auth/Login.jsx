@@ -94,7 +94,7 @@ export default function Login({ status, canResetPassword }) {
 
                     <Button
                         type="submit"
-                        className="w-full h-12 bg-primary hover:bg-primary/90 text-white text-lg font-semibold transition-all"
+                        className="w-full h-12 bg-primary hover:bg-primary/90 text-secondary text-lg font-semibold transition-all"
                         disabled={processing}
                     >
                         {processing ? (
@@ -106,32 +106,6 @@ export default function Login({ status, canResetPassword }) {
                         )}
                     </Button>
                 </form>
-
-                <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t" />
-                    </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-background px-2 text-muted-foreground">
-                            Ou continue com
-                        </span>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                    <Button variant="outline" className="h-12 gap-2">
-                        <svg className="w-5 h-5" viewBox="0 0 24 24">
-                            {/* Ícone do Google */}
-                        </svg>
-                        Google
-                    </Button>
-                    <Button variant="outline" className="h-12 gap-2">
-                        <svg className="w-5 h-5" viewBox="0 0 24 24">
-                            {/* Ícone do GitHub */}
-                        </svg>
-                        GitHub
-                    </Button>
-                </div>
 
                 <div className="text-center text-sm text-muted-foreground">
                     Não tem uma conta?{" "}

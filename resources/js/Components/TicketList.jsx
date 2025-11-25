@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function TicketList({ tickets }) {
-    console.log(tickets)
     if (!tickets || tickets.length === 0) {
         return (
             <Card className="border-dashed">

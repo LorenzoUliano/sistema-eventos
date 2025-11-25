@@ -3,9 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\Model;
 
-class OrderTicket extends Pivot
+class OrderTicket extends Model
 {
     use HasFactory;
 
@@ -16,5 +16,7 @@ class OrderTicket extends Pivot
         'ticket_id',
         'quantity',
         'total_price',
+        'user_id',
+        'status',
     ];
 }

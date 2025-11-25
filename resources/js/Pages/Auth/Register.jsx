@@ -24,7 +24,7 @@ export default function Register() {
     return (
         <GuestLayout>
             <Head title="Cadastro" />
-            
+
             <CardContent className="space-y-6">
                 <CardTitle className="text-3xl font-bold text-center text-primary">
                     Crie sua conta
@@ -102,48 +102,22 @@ export default function Register() {
                                 <p className="text-destructive text-sm">{errors.password_confirmation}</p>
                             )}
                         </div>
+                        <Button
+                            type="submit"
+                            className="w-full h-12 bg-primary hover:bg-primary/90 text-secondary text-lg font-semibold transition-all"
+                            disabled={processing}
+                        >
+                            {processing ? (
+                                <div className="flex items-center gap-2">
+                                    <span className="animate-pulse">Criando conta...</span>
+                                </div>
+                            ) : (
+                                <span>Cadastrar</span>
+                            )}
+                        </Button>
                     </div>
 
-                    <Button
-                        type="submit"
-                        className="w-full h-12 bg-primary hover:bg-primary/90 text-white text-lg font-semibold transition-all"
-                        disabled={processing}
-                    >
-                        {processing ? (
-                            <div className="flex items-center gap-2">
-                                <span className="animate-pulse">Criando conta...</span>
-                            </div>
-                        ) : (
-                            <span>Cadastrar</span>
-                        )}
-                    </Button>
                 </form>
-
-                <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t" />
-                    </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-background px-2 text-muted-foreground">
-                            Ou continue com
-                        </span>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                    <Button variant="outline" className="h-12 gap-2">
-                        <svg className="w-5 h-5" viewBox="0 0 24 24">
-                            {/* Ícone do Google */}
-                        </svg>
-                        Google
-                    </Button>
-                    <Button variant="outline" className="h-12 gap-2">
-                        <svg className="w-5 h-5" viewBox="0 0 24 24">
-                            {/* Ícone do GitHub */}
-                        </svg>
-                        GitHub
-                    </Button>
-                </div>
 
                 <div className="text-center text-sm text-muted-foreground">
                     Já tem uma conta?{" "}

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, usePage, router } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
 import { useDarkMode } from "@/Hooks/useDarkMode";
 import { route } from 'ziggy-js';
@@ -9,8 +9,6 @@ import {
     User,
     LayoutDashboard,
     Ticket,
-    Home,
-    CalendarDays,
     Menu,
     X
 } from "lucide-react";
@@ -31,18 +29,18 @@ export default function Navbar({ layoutType = 'default', auth }) {
         router.post(route(routeName)); // Corrigido aqui
     };
 
-    const navigationLinks = [
+    const navigationLinks = isPromoterLayout ? [
         {
-            href: isPromoterLayout ? route("promoter.dashboard") : "/",
-            label: isPromoterLayout ? "Dashboard" : "Home",
-            icon: isPromoterLayout ? LayoutDashboard : Home
+            href: route("promoter.dashboard"),
+            label: "Dashboard",
+            icon: LayoutDashboard
         },
         {
-            href: isPromoterLayout ? route("promoter.register") : "/events",
-            label: isPromoterLayout ? "Criar Promoter" : "Eventos",
-            icon: isPromoterLayout ? User : CalendarDays
+            href: route("promoter.register"),
+            label: "Criar Promoter",
+            icon: User
         }
-    ];
+    ] : [];
 
 
     return (
@@ -86,7 +84,7 @@ export default function Navbar({ layoutType = 'default', auth }) {
 
                         {(promoter || user) ? (
                             <div className="flex items-center gap-4">
-                                <Link href={user && !isPromoterLayout ? "/profile" : "#"} className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors cursor-pointer">
+                                <Link href={user && !isPromoterLayout ? route('profile.index') : "#"} className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors cursor-pointer">
                                     <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
                                         <User className="w-4 h-4" />
                                     </div>
@@ -125,8 +123,8 @@ export default function Navbar({ layoutType = 'default', auth }) {
 
                 {/* Mobile Menu */}
                 {isMenuOpen && (
-                    <div className="md:hidden absolute w-full bg-card/95 backdrop-blur-lg border-b border-border">
-                        <div className="px-4 pt-2 pb-6 space-y-4">
+                    <div className="md:hidden fixed left-0 right-0 top-16 bg-card/95 backdrop-blur-lg border-b border-border shadow-theme z-40">
+                        <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8 pt-2 pb-6 space-y-4 max-h-[calc(100vh-4rem)] overflow-y-auto">
                             <div className="flex flex-col gap-2">
                                 {navigationLinks.map((link) => (
                                     <Link
@@ -146,18 +144,18 @@ export default function Navbar({ layoutType = 'default', auth }) {
                                     <div className="space-y-4">
                                         {user && !isPromoterLayout ? (
                                             <Link
-                                                href="/profile"
+                                                href={route('profile.index')}
                                                 className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/5 transition-colors"
                                                 onClick={() => setIsMenuOpen(false)}
                                             >
-                                                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                                                    <User className="w-4 h-4 text-primary" />
-                                                </div>
-                                                <div>
-                                                    <p className="font-medium text-primary">{user.name}</p>
-                                                    <p className="text-sm text-primary/60">Perfil Usuário</p>
-                                                </div>
-                                            </Link>
+                                                 <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                                                     <User className="w-4 h-4 text-primary" />
+                                                 </div>
+                                                 <div>
+                                                     <p className="font-medium text-primary">{user.name}</p>
+                                                     <p className="text-sm text-primary/60">Perfil Usuário</p>
+                                                 </div>
+                                             </Link>
                                         ) : (
                                             <div className="flex items-center gap-3 px-4">
                                                 <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">

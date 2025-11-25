@@ -64,3 +64,44 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+# Sistema de Eventos - Docker & Pix Fake
+
+## Pix Fake Flow (Persistente)
+Endpoints:
+- POST /api/pix/payments (inicia pagamento) body: { amount, purchaseData }
+- GET /api/pix/payments/{id} (status)
+- POST /api/pix/payments/{id}/confirm (simula confirmação)
+
+## Docker (Desenvolvimento)
+Requisitos: Docker + Docker Compose.
+
+```bash
+docker compose up -d --build
+```
+Acessar aplicação: http://localhost:8080
+Frontend Vite dev: http://localhost:5173
+
+Executar migrations/seeds dentro do container app:
+```bash
+docker compose exec app php artisan migrate --seed
+```
+
+## Docker (Produção - build multi-stage)
+```bash
+docker build -t sistema-eventos:prod .
+```
+Run:
+```bash
+docker run -p 8080:80 sistema-eventos:prod
+```
+
+## Variáveis de Ambiente Principais
+PIX_EXPIRATION_MINUTES (default 15)
+DB_* credenciais
+APP_URL
+
+## Próximos Passos
+- Integrar PixPaymentService no controller (substituir MockPixService)
+- Testes de feature para fluxo Pix
+- Ajustar frontend para polling status

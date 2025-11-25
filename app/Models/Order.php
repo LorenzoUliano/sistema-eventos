@@ -13,6 +13,8 @@ class Order extends Model
     protected $fillable = [
         'user_id',
         'status',
+        'total_amount',
+        'pix_payment_id',
     ];
 
     // Relacionamento: um pedido pertence a um usuário
@@ -25,7 +27,7 @@ class Order extends Model
     public function tickets()
     {
         return $this->belongsToMany(Ticket::class, 'order_tickets')
-                    ->withPivot('quantity', 'total_price')
+                    ->withPivot('quantity', 'total_price', 'status')
                     ->withTimestamps();
     }
 
