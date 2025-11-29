@@ -369,13 +369,6 @@ export default function OrdersContent() {
                                                             Ver detalhes
                                                         </Button>
                                                     </Link>
-                                                    {firstTicketPivotId && (
-                                                        <Link href={route('orderTicket.show', firstTicketPivotId)}>
-                                                            <Button variant="secondary" size="sm" title="Ver QR do ingresso">
-                                                                QR Code
-                                                            </Button>
-                                                        </Link>
-                                                    )}
                                                     {order.status === "pending" && (
                                                         <Button
                                                             variant="destructive"
