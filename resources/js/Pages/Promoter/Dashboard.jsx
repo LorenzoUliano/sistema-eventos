@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, usePage } from "@inertiajs/react";
+import {Head, Link, usePage} from "@inertiajs/react";
 import { Button } from "@/Components/ui/button";
 import PromoterLayout from "@/Layouts/PromoterLayout";
 import { Badge } from "@/Components/ui/badge";
@@ -79,6 +79,8 @@ export default function Dashboard() {
 
     return (
         <PromoterLayout>
+            <Head title={"Dashboard"}/>
+
             <div className="space-y-8">
                 {/* Header com gradiente */}
                 <div className="bg-gradient-to-r from-primary to-primary/80 rounded-xl p-8 text-secondary shadow-lg">

@@ -20,6 +20,31 @@ export default function Purchase() {
     const [loading, setLoading] = useState(false);
     const [expiresAt, setExpiresAt] = useState(null);
 
+    // Chave única para o sessionStorage baseada no evento e usuário
+    const storageKey = `pix_payment_${event.id}_${auth.user.id}`;
+
+    // Recuperar QR Code do sessionStorage ao carregar a página
+    useState(() => {
+        const savedPayment = sessionStorage.getItem(storageKey);
+        if (savedPayment) {
+            try {
+                const payment = JSON.parse(savedPayment);
+                // Verifica se o pagamento não expirou
+                if (payment.expiresAt && new Date(payment.expiresAt) > new Date()) {
+                    setQrCode(payment.qrCode);
+                    setPaymentId(payment.paymentId);
+                    setExpiresAt(payment.expiresAt);
+                } else {
+                    // Remove se expirou
+                    sessionStorage.removeItem(storageKey);
+                }
+            } catch (e) {
+                console.error('Erro ao recuperar pagamento salvo:', e);
+                sessionStorage.removeItem(storageKey);
+            }
+        }
+    }, []);
+
     const handlePaymentFormChange = (paymentFormId) => {
         setSelectedPaymentForm(paymentFormId);
     };
@@ -65,15 +90,34 @@ export default function Purchase() {
                 amount: totalAmount,
                 purchaseData: purchaseData,
             });
-            setQrCode(response.data.qrCode);
-            setPaymentId(response.data.id);
-            setExpiresAt(response.data.expiresAt);
+
+            const paymentData = {
+                qrCode: response.data.qrCode,
+                paymentId: response.data.id,
+                expiresAt: response.data.expiresAt,
+            };
+
+            // Salva no state
+            setQrCode(paymentData.qrCode);
+            setPaymentId(paymentData.paymentId);
+            setExpiresAt(paymentData.expiresAt);
+
+            // Salva no sessionStorage
+            sessionStorage.setItem(storageKey, JSON.stringify(paymentData));
         } catch (error) {
             console.error('Erro:', error);
             alert('Erro ao gerar QR code: ' + (error.response?.data?.error || error.message));
         } finally {
             setLoading(false);
         }
+    };
+
+    // Função para limpar o QR Code (chamada quando o pagamento é confirmado ou expira)
+    const clearQrCode = () => {
+        setQrCode(null);
+        setPaymentId(null);
+        setExpiresAt(null);
+        sessionStorage.removeItem(storageKey);
     };
 
     return (
@@ -88,50 +132,10 @@ export default function Purchase() {
 
                 {!qrCode ? (
                     <>
-                        <section className="space-y-2">
-                            <h3 className="text-xl font-semibold">Formas de pagamento</h3>
-
-                            {paymentForms.length > 0 ? (
-                                <RadioGroup
-                                    value={selectedPaymentForm}
-                                    onValueChange={handlePaymentFormChange}
-                                    className="grid md:grid-cols-2 gap-3"
-                                >
-                                    {paymentForms.map((item) => (
-                                        <Card
-                                            key={item.id}
-                                            className={`p-4 border cursor-pointer transition-all duration-200 ${
-                                                selectedPaymentForm === item.id
-                                                    ? "border-primary bg-secondary/50"
-                                                    : "hover:bg-muted"
-                                            }`}
-                                            onClick={() => handlePaymentFormChange(item.id)}
-                                        >
-                                            <div className="flex items-center space-x-3">
-                                                <RadioGroupItem
-                                                    value={item.id}
-                                                    id={`payment-${item.id}`}
-                                                    className="text-primary"
-                                                />
-                                                <Label
-                                                    htmlFor={`payment-${item.id}`}
-                                                    className="text-lg font-medium cursor-pointer"
-                                                >
-                                                    {item.name}
-                                                </Label>
-                                            </div>
-                                        </Card>
-                                    ))}
-                                </RadioGroup>
-                            ) : (
-                                <p className="text-sm text-muted-foreground">Nenhuma forma de pagamento disponível.</p>
-                            )}
-                        </section>
-
                         <section className="flex gap-4 justify-end">
                             <Button
-                                className="md:w-36 w-full"
-                                variant="outline"
+                                className=" w-full"
+                                variant="secondary"
                                 size="lg"
                                 onClick={handleGenerateQrCode}
                                 disabled={loading || tickets.length === 0}
@@ -142,7 +146,7 @@ export default function Purchase() {
                                         Gerando...
                                     </>
                                 ) : (
-                                    "PIX"
+                                    "Finalizar compra com PIX"
                                 )}
                             </Button>
                             {/* Botão de outra forma de pagamento fica visível somente se forma selecionada não for PIX */}
@@ -167,7 +171,14 @@ export default function Purchase() {
                         </section>
                     </>
                 ) : (
-                    <QrCodeDisplay qrCode={qrCode} amount={calculateTotal()} paymentId={paymentId} expiresAt={expiresAt} />
+                    <QrCodeDisplay
+                        qrCode={qrCode}
+                        amount={calculateTotal()}
+                        paymentId={paymentId}
+                        expiresAt={expiresAt}
+                        onPaymentConfirmed={clearQrCode}
+                        onExpired={clearQrCode}
+                    />
                 )}
             </div>
         </AuthenticatedLayout>

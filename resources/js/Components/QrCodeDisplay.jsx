@@ -8,7 +8,7 @@ import { Label } from '@/Components/ui/label';
 import { Loader2, Check, Copy } from 'lucide-react';
 import { useToast } from '@/Components/ui/toast-provider';
 
-export default function QrCodeDisplay({ qrCode, amount, paymentId, expiresAt }) {
+export default function QrCodeDisplay({ qrCode, amount, paymentId, expiresAt, onPaymentConfirmed, onExpired }) {
     const [scanned, setScanned] = useState(false);
     const [processing, setProcessing] = useState(false);
     const [copied, setCopied] = useState(false);
@@ -26,6 +26,10 @@ export default function QrCodeDisplay({ qrCode, amount, paymentId, expiresAt }) 
                 setRemaining(0);
                 clearInterval(interval);
                 push({ title: 'PIX expirado', description: 'Gere um novo QR para continuar.' });
+                // Notifica que expirou
+                if (onExpired) {
+                    onExpired();
+                }
             } else {
                 const minutes = Math.floor(diff / 60000);
                 const seconds = Math.floor((diff % 60000) / 1000);
@@ -33,11 +37,17 @@ export default function QrCodeDisplay({ qrCode, amount, paymentId, expiresAt }) 
             }
         }, 1000);
         return () => clearInterval(interval);
-    }, [expiresAt, push]);
+    }, [expiresAt, push, onExpired]);
 
     const finalize = (response) => {
         setScanned(true);
         push({ title: 'Pagamento confirmado', description: 'Redirecionando para seus pedidos.' });
+
+        // Notifica que o pagamento foi confirmado
+        if (onPaymentConfirmed) {
+            onPaymentConfirmed();
+        }
+
         const redirectUrl = response.data.redirect || '/profile/orders';
         setTimeout(() => { window.location.href = redirectUrl; }, 1200);
     };
