@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import axios from 'axios';
 import { Card } from '@/Components/ui/card';
@@ -6,29 +6,53 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Loader2, Check, Copy } from 'lucide-react';
+import { useToast } from '@/Components/ui/toast-provider';
 
-export default function QrCodeDisplay({ qrCode, amount, paymentId }) {
+export default function QrCodeDisplay({ qrCode, amount, paymentId, expiresAt }) {
     const [scanned, setScanned] = useState(false);
     const [processing, setProcessing] = useState(false);
     const [copied, setCopied] = useState(false);
+    const { push } = useToast();
+    const [remaining, setRemaining] = useState(null);
 
     const scanUrl = qrCode; // ja e a URL /api/pix/payments/{id}/scan
+
+    useEffect(() => {
+        if (!expiresAt) return;
+        const expiry = new Date(expiresAt);
+        const interval = setInterval(() => {
+            const diff = expiry.getTime() - Date.now();
+            if (diff <= 0) {
+                setRemaining(0);
+                clearInterval(interval);
+                push({ title: 'PIX expirado', description: 'Gere um novo QR para continuar.' });
+            } else {
+                const minutes = Math.floor(diff / 60000);
+                const seconds = Math.floor((diff % 60000) / 1000);
+                setRemaining(`${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`);
+            }
+        }, 1000);
+        return () => clearInterval(interval);
+    }, [expiresAt, push]);
+
+    const finalize = (response) => {
+        setScanned(true);
+        push({ title: 'Pagamento confirmado', description: 'Redirecionando para seus pedidos.' });
+        const redirectUrl = response.data.redirect || '/profile/orders';
+        setTimeout(() => { window.location.href = redirectUrl; }, 1200);
+    };
 
     const handleSimulateScan = async () => {
         setProcessing(true);
         try {
             const response = await axios.get(scanUrl);
             if (response.data.status === 'paid' || response.data.status === 'already_paid') {
-                setScanned(true);
-                setTimeout(() => {
-                    window.location.href = '/orders/' + response.data.order.id;
-                }, 1500);
+                finalize(response);
             } else {
-                alert('Falha ao confirmar pagamento');
+                push({ title: 'Falha na confirmação', description: 'Verifique o status e tente novamente.' });
             }
         } catch (error) {
-            console.error('Erro:', error);
-            alert('Erro ao processar pagamento: ' + (error.response?.data?.error || error.message));
+            push({ title: 'Erro de rede', description: error.response?.data?.error || error.message });
         } finally {
             setProcessing(false);
         }
@@ -40,16 +64,12 @@ export default function QrCodeDisplay({ qrCode, amount, paymentId }) {
         try {
             const response = await axios.post(`/api/pix/payments/${paymentId}/confirm`);
             if (response.data.status === 'paid' || response.data.status === 'already_paid') {
-                setScanned(true);
-                setTimeout(() => {
-                    window.location.href = '/orders/' + response.data.order.id;
-                }, 1500);
+                finalize(response);
             } else {
-                alert('Falha ao confirmar pagamento');
+                push({ title: 'Falha na confirmação', description: 'Verifique o status e tente novamente.' });
             }
         } catch (error) {
-            console.error('Erro:', error);
-            alert('Erro ao processar pagamento: ' + (error.response?.data?.error || error.message));
+            push({ title: 'Erro de rede', description: error.response?.data?.error || error.message });
         } finally {
             setProcessing(false);
         }
@@ -108,6 +128,9 @@ export default function QrCodeDisplay({ qrCode, amount, paymentId }) {
                         </div>
                     </div>
                 </div>
+            )}
+            {remaining !== null && !scanned && (
+                <div className="text-sm text-muted-foreground">Expira em: <span className="font-mono">{remaining}</span></div>
             )}
         </Card>
     );

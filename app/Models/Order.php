@@ -27,14 +27,19 @@ class Order extends Model
     public function tickets()
     {
         return $this->belongsToMany(Ticket::class, 'order_tickets')
-                    ->withPivot('quantity', 'total_price', 'status')
+                    ->withPivot('id', 'unit_price', 'status')
                     ->withTimestamps();
+    }
+
+    public function orderTickets()
+    {
+        return $this->hasMany(OrderTicket::class);
     }
 
     public static function userOrders()
     {
         return self::where('user_id', Auth::user()->id)
-            ->with(['tickets.event.company'])
+            ->with(['tickets.event.company', 'orderTickets'])
             ->orderBy('created_at', 'desc')
             ->get();
     }

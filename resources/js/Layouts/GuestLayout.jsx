@@ -1,5 +1,5 @@
 
-import { Card, CardHeader } from '@/components/ui/card';
+import { Card, CardHeader } from '@/Components/ui/card';
 import { Lock } from 'lucide-react';
 
 export default function GuestLayout({ children }) {

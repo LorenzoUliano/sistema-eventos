@@ -1,8 +1,8 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, router } from "@inertiajs/react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/Components/ui/card";
+import { Badge } from "@/Components/ui/badge";
+import { Button } from "@/Components/ui/button";
 import { useState } from "react";
 import {
     ArrowLeft,
@@ -58,40 +58,27 @@ export default function OrderDetails({ order }) {
         });
     };
 
-    const orderTotal = order?.tickets?.reduce((sum, ticket) => {
-        return sum + (parseFloat(ticket.pivot?.total_price) || 0);
+    const orderTotal = order?.order_tickets?.reduce((sum, ot) => {
+        return sum + (parseFloat(ot.unit_price) || 0);
     }, 0) || 0;
 
-    const totalTickets = order?.tickets?.reduce((sum, ticket) => {
-        return sum + (parseInt(ticket.pivot?.quantity) || 0);
-    }, 0) || 0;
-
-    const handleCancelOrder = () => {
-        if (confirm("Tem certeza que deseja cancelar este pedido?")) {
-            setIsLoading(true);
-            router.delete(`/orders/${order.id}`, {
-                onFinish: () => setIsLoading(false),
-            });
-        }
-    };
+    const totalTickets = order?.order_tickets?.length || 0;
 
     const handleDownloadReceipt = () => {
-        // Gerar comprovante completo
         const printWindow = window.open('', '_blank');
         const orderDate = formatDate(order?.created_at);
-        const ticketsHtml = order?.tickets?.map((ticket, index) => {
-            const ticketPrice = parseFloat(ticket.pivot?.total_price) || 0;
-            const ticketQuantity = parseInt(ticket.pivot?.quantity) || 0;
-            const unitPrice = ticketPrice / ticketQuantity;
-            const eventName = ticket.event?.name || ticket.name || "Evento não disponível";
-            
+        const ticketsHtml = order?.order_tickets?.map((ot, index) => {
+            const unitPrice = parseFloat(ot.unit_price) || 0;
+            const ticket = ot.ticket;
+            const eventName = ticket?.event?.name || ticket?.name || "Evento não disponível";
+
             return `
                 <div class="ticket-item">
                     <h3>${eventName}</h3>
-                    <p><strong>Tipo:</strong> ${ticket.name}</p>
-                    <p><strong>Quantidade:</strong> ${ticketQuantity}x</p>
+                    <p><strong>Tipo:</strong> ${ticket?.name || ''}</p>
+                    <p><strong>Quantidade:</strong> 1x</p>
                     <p><strong>Preço unitário:</strong> ${formatCurrency(unitPrice)}</p>
-                    <p><strong>Subtotal:</strong> ${formatCurrency(ticketPrice)}</p>
+                    <p><strong>Subtotal:</strong> ${formatCurrency(unitPrice)}</p>
                 </div>
             `;
         }).join('') || '<p>Nenhum ingresso encontrado</p>';
@@ -102,38 +89,38 @@ export default function OrderDetails({ order }) {
                     <title>Comprovante - Pedido #${order?.id}</title>
                     <style>
                         * { margin: 0; padding: 0; box-sizing: border-box; }
-                        body { 
-                            font-family: Arial, sans-serif; 
-                            padding: 40px 20px; 
-                            max-width: 800px; 
+                        body {
+                            font-family: Arial, sans-serif;
+                            padding: 40px 20px;
+                            max-width: 800px;
                             margin: 0 auto;
                             color: #333;
                         }
-                        .header { 
-                            text-align: center; 
-                            margin-bottom: 40px; 
+                        .header {
+                            text-align: center;
+                            margin-bottom: 40px;
                             padding-bottom: 20px;
                             border-bottom: 2px solid #ddd;
                         }
-                        .header h1 { 
-                            font-size: 28px; 
-                            margin-bottom: 10px; 
+                        .header h1 {
+                            font-size: 28px;
+                            margin-bottom: 10px;
                             color: #1a1a1a;
                         }
-                        .order-info { 
-                            margin-bottom: 30px; 
+                        .order-info {
+                            margin-bottom: 30px;
                             padding: 20px;
                             background: #f9f9f9;
                             border-radius: 8px;
                         }
-                        .order-info p { 
-                            margin: 8px 0; 
+                        .order-info p {
+                            margin: 8px 0;
                             font-size: 14px;
                         }
-                        .ticket-item { 
-                            border: 1px solid #ddd; 
-                            padding: 20px; 
-                            margin-bottom: 15px; 
+                        .ticket-item {
+                            border: 1px solid #ddd;
+                            padding: 20px;
+                            margin-bottom: 15px;
                             border-radius: 8px;
                             background: #fff;
                         }
@@ -146,10 +133,10 @@ export default function OrderDetails({ order }) {
                             margin: 5px 0;
                             font-size: 14px;
                         }
-                        .total { 
-                            font-size: 20px; 
-                            font-weight: bold; 
-                            text-align: right; 
+                        .total {
+                            font-size: 20px;
+                            font-weight: bold;
+                            text-align: right;
                             margin-top: 30px;
                             padding-top: 20px;
                             border-top: 2px solid #ddd;
@@ -196,17 +183,6 @@ export default function OrderDetails({ order }) {
             printWindow.print();
             printWindow.close();
         }, 250);
-    };
-
-    // Obter nome do evento (com fallback)
-    const getEventName = (ticket) => {
-        if (ticket.event && ticket.event.name) {
-            return ticket.event.name;
-        }
-        if (ticket.name) {
-            return `Ingresso: ${ticket.name}`;
-        }
-        return "Evento não disponível";
     };
 
     return (
@@ -279,7 +255,7 @@ export default function OrderDetails({ order }) {
                         <CardContent>
                             <div className="text-2xl font-bold">{totalTickets}</div>
                             <p className="text-xs text-muted-foreground mt-1">
-                                {order?.tickets?.length || 0} tipo{order?.tickets?.length !== 1 ? 's' : ''} diferente{order?.tickets?.length !== 1 ? 's' : ''}
+                                {order?.order_tickets?.length || 0} tipo{order?.order_tickets?.length !== 1 ? 's' : ''} diferente{order?.order_tickets?.length !== 1 ? 's' : ''}
                             </p>
                         </CardContent>
                     </Card>
@@ -335,136 +311,105 @@ export default function OrderDetails({ order }) {
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        {order?.tickets && order.tickets.length > 0 ? (
+                        {order?.order_tickets && order.order_tickets.length > 0 ? (
                             <div className="space-y-4">
-                                {order.tickets.map((ticket, index) => {
-                                    const ticketPrice = parseFloat(ticket.pivot?.total_price) || 0;
-                                    const ticketQuantity = parseInt(ticket.pivot?.quantity) || 0;
-                                    const unitPrice = ticketPrice / ticketQuantity;
+                                {order.order_tickets.map((ot) => (
+                                    <div key={ot.id} className="p-4 border rounded-lg space-y-4 transition-all hover:shadow-md">
+                                        {/* Informações do Evento */}
+                                        {ot.ticket?.event ? (
+                                            <div className="space-y-3">
+                                                <div>
+                                                    <h3 className="font-semibold text-lg mb-2">
+                                                        {ot.ticket.event.name}
+                                                    </h3>
+                                                    {ot.ticket.event.description && (
+                                                        <p className="text-sm text-muted-foreground line-clamp-2">
+                                                            {ot.ticket.event.description}
+                                                        </p>
+                                                    )}
+                                                </div>
 
-                                    return (
-                                        <div
-                                            key={index}
-                                            className="p-4 border rounded-lg space-y-4 transition-all hover:shadow-md"
-                                        >
-                                            {/* Informações do Evento */}
-                                            {ticket.event ? (
-                                                <div className="space-y-3">
-                                                    <div>
-                                                        <h3 className="font-semibold text-lg mb-2">
-                                                            {ticket.event.name}
-                                                        </h3>
-                                                        {ticket.event.description && (
-                                                            <p className="text-sm text-muted-foreground line-clamp-2">
-                                                                {ticket.event.description}
-                                                            </p>
-                                                        )}
-                                                    </div>
-
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                                                        {ticket.event.start_date && (
-                                                            <div className="flex items-center gap-2 text-muted-foreground">
-                                                                <Calendar className="w-4 h-4" />
-                                                                <span>
-                                                                    {new Date(ticket.event.start_date).toLocaleDateString('pt-BR', {
-                                                                        weekday: 'long',
-                                                                        day: '2-digit',
-                                                                        month: 'long',
-                                                                        year: 'numeric',
-                                                                        hour: '2-digit',
-                                                                        minute: '2-digit'
-                                                                    })}
-                                                                </span>
-                                                            </div>
-                                                        )}
-                                                        {ticket.event.city && (
-                                                            <div className="flex items-center gap-2 text-muted-foreground">
-                                                                <MapPin className="w-4 h-4" />
-                                                                <span>
-                                                                    {ticket.event.city}
-                                                                    {ticket.event.state && ` - ${ticket.event.state}`}
-                                                                </span>
-                                                            </div>
-                                                        )}
-                                                        {ticket.event.company && (
-                                                            <div className="flex items-center gap-2 text-muted-foreground">
-                                                                <Building className="w-4 h-4" />
-                                                                <span>{ticket.event.company.name}</span>
-                                                            </div>
-                                                        )}
-                                                    </div>
-
-                                                    {ticket.event.image_url && (
-                                                        <div className="rounded-lg overflow-hidden">
-                                                            <img
-                                                                src={ticket.event.image_url}
-                                                                alt={ticket.event.name}
-                                                                className="w-full h-48 object-cover"
-                                                            />
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                                                    {ot.ticket.event.start_date && (
+                                                        <div className="flex items-center gap-2 text-muted-foreground">
+                                                            <Calendar className="w-4 h-4" />
+                                                            <span>
+                                                                {new Date(ot.ticket.event.start_date).toLocaleDateString('pt-BR', {
+                                                                    weekday: 'long',
+                                                                    day: '2-digit',
+                                                                    month: 'long',
+                                                                    year: 'numeric',
+                                                                    hour: '2-digit',
+                                                                    minute: '2-digit'
+                                                                })}
+                                                            </span>
                                                         </div>
                                                     )}
+                                                    {ot.ticket.event.city && (
+                                                        <div className="flex items-center gap-2 text-muted-foreground">
+                                                            <MapPin className="w-4 h-4" />
+                                                            <span>
+                                                                {ot.ticket.event.city}
+                                                                {ot.ticket.event.state && ` - ${ot.ticket.event.state}`}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                    {ot.ticket.event.company && (
+                                                        <div className="flex items-center gap-2 text-muted-foreground">
+                                                            <Building className="w-4 h-4" />
+                                                            <span>{ot.ticket.event.company.name}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
 
-                                                    <Link
-                                                        href={`/event/${ticket.event.id}`}
-                                                        className="inline-block"
-                                                    >
-                                                        <Button variant="outline" size="sm">
-                                                            Ver evento
-                                                        </Button>
-                                                    </Link>
-                                                </div>
-                                            ) : (
-                                                <div className="space-y-3 p-4 bg-muted/50 rounded-lg">
-                                                    <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
-                                                        <AlertCircle className="w-5 h-5" />
-                                                        <h3 className="font-semibold text-lg">
-                                                            {getEventName(ticket)}
-                                                        </h3>
+                                                {ot.ticket.event.image_url && (
+                                                    <div className="rounded-lg overflow-hidden">
+                                                        <img
+                                                            src={ot.ticket.event.image_url}
+                                                            alt={ot.ticket.event.name}
+                                                            className="w-full h-48 object-cover"
+                                                        />
                                                     </div>
-                                                    <p className="text-sm text-muted-foreground">
-                                                        Informações detalhadas do evento não estão disponíveis no momento.
-                                                    </p>
-                                                </div>
-                                            )}
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <div className="text-sm text-muted-foreground">
+                                                Informações do evento não disponíveis
+                                            </div>
+                                        )}
 
-                                            {/* Informações do Ingresso */}
-                                            <div className="pt-4 border-t">
-                                                <div className="flex items-start justify-between">
-                                                    <div className="space-y-1">
-                                                        <h4 className="font-semibold">
-                                                            {ticket.name}
-                                                        </h4>
-                                                        <p className="text-sm text-muted-foreground">
-                                                            Preço unitário: {formatCurrency(unitPrice)}
-                                                        </p>
-                                                    </div>
-                                                    <div className="text-right">
-                                                        <p className="text-sm text-muted-foreground">
-                                                            Quantidade
-                                                        </p>
-                                                        <p className="text-lg font-bold">
-                                                            {ticketQuantity}x
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div className="flex items-center justify-between mt-4 pt-4 border-t">
-                                                    <span className="font-semibold">Subtotal:</span>
-                                                    <span className="text-xl font-bold">
-                                                        {formatCurrency(ticketPrice)}
-                                                    </span>
-                                                </div>
+                                        {/* Informações do Ingresso */}
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <div>
+                                                <p className="text-sm text-muted-foreground">Ingresso</p>
+                                                <p className="font-semibold">#{ot.id}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-sm text-muted-foreground">Preço</p>
+                                                <p className="font-semibold">{formatCurrency(parseFloat(ot.unit_price) || 0)}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-sm text-muted-foreground">Status</p>
+                                                <p className="font-semibold">{ot.status}</p>
                                             </div>
                                         </div>
-                                    );
-                                })}
+
+                                        {/* Ações por ingresso */}
+                                        <div className="flex items-center gap-2">
+                                            <Button variant="outline" size="sm" onClick={() => router.get(`/orders/${order.id}`)}>
+                                                Ver detalhes do pedido
+                                            </Button>
+                                            {order?.status === 'paid' && (
+                                                <Button variant="secondary" size="sm" onClick={() => alert(`Ação para order_ticket ${ot.id}`)}>
+                                                    Ação
+                                                </Button>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         ) : (
-                            <div className="text-center py-12">
-                                <Ticket className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                                <p className="text-sm text-muted-foreground">
-                                    Nenhum ingresso encontrado neste pedido
-                                </p>
-                            </div>
+                            <p className="text-sm text-muted-foreground">Nenhum ingresso encontrado</p>
                         )}
                     </CardContent>
                 </Card>
@@ -499,4 +444,3 @@ export default function OrderDetails({ order }) {
         </AuthenticatedLayout>
     );
 }
-

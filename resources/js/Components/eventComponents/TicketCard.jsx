@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
-import { Button } from "@/components/ui/button";
-import { useCart } from "@/contexts/cart-context"; // Você precisa criar este contexto
+import { Button } from "@/Components/ui/button";
+import { useCart } from "@/Contexts/cart-context"; // Você precisa criar este contexto
 
 export const TicketCard = ({ ticket }) => {
     const { addToCart, updateQuantity, cartItems } = useCart();

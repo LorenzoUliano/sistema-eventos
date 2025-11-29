@@ -15,6 +15,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PromoterController;
 use App\Http\Controllers\TicketController;
 use \App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\OrderTicketController;
 
 
 Route::get('/', function () {
@@ -45,6 +46,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/orders', [OrderController::class, 'index'])->name('order.index');
     Route::get('/orders/{id}', [OrderController::class, 'show'])->name('order.show');
     Route::delete('/orders/{id}', [OrderController::class, 'destroy'])->name('order.destroy');
+
+    Route::get('/order-tickets/{id}', [OrderTicketController::class, 'show'])->name('orderTicket.show');
+    Route::get('/order-tickets/{id}/scan', [OrderTicketController::class, 'scan'])->name('orderTicket.scan');
+    Route::post('/order-tickets/{id}/validate', [OrderTicketController::class, 'validateManual'])->name('orderTicket.validate');
 
 });
 

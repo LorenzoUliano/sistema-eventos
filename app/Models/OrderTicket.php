@@ -14,9 +14,18 @@ class OrderTicket extends Model
     protected $fillable = [
         'order_id',
         'ticket_id',
-        'quantity',
-        'total_price',
+        'unit_price',
         'user_id',
         'status',
     ];
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
+
+    public function ticket()
+    {
+        return $this->belongsTo(Ticket::class);
+    }
 }

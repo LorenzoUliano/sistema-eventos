@@ -18,13 +18,14 @@ export default function Purchase() {
     const [qrCode, setQrCode] = useState(null);
     const [paymentId, setPaymentId] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [expiresAt, setExpiresAt] = useState(null);
 
     const handlePaymentFormChange = (paymentFormId) => {
         setSelectedPaymentForm(paymentFormId);
     };
 
     const calculateTotal = () => {
-        return tickets.reduce((sum, ticket) => sum + (ticket.price * ticket.quantity), 0);
+        return tickets.reduce((sum, ticket) => sum + (ticket.line_total ?? (ticket.price * ticket.quantity)), 0);
     };
 
     const handlePurchase = async () => {
@@ -66,6 +67,7 @@ export default function Purchase() {
             });
             setQrCode(response.data.qrCode);
             setPaymentId(response.data.id);
+            setExpiresAt(response.data.expiresAt);
         } catch (error) {
             console.error('Erro:', error);
             alert('Erro ao gerar QR code: ' + (error.response?.data?.error || error.message));
@@ -165,7 +167,7 @@ export default function Purchase() {
                         </section>
                     </>
                 ) : (
-                    <QrCodeDisplay qrCode={qrCode} amount={calculateTotal()} paymentId={paymentId} />
+                    <QrCodeDisplay qrCode={qrCode} amount={calculateTotal()} paymentId={paymentId} expiresAt={expiresAt} />
                 )}
             </div>
         </AuthenticatedLayout>

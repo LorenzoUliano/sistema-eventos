@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, router } from "@inertiajs/react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/Components/ui/button";
 import { useDarkMode } from "@/Hooks/useDarkMode";
 import { route } from 'ziggy-js';
 import {

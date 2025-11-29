@@ -78,7 +78,13 @@ class EventService
 
         $imageUrl = $this->uploadImage($request);
 
-        $this->eventRepository->update($event, array_merge($request->except(['image']), ['image_url' => $imageUrl]));
+        // Only update image_url if a new image was uploaded
+        $updateData = $request->except(['image', '_method']);
+        if ($imageUrl) {
+            $updateData['image_url'] = $imageUrl;
+        }
+
+        $this->eventRepository->update($event, $updateData);
 
         return $event;
     }

@@ -6,6 +6,7 @@ use App\Services\PixPaymentService;
 use App\Services\OrderService;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 
 class PixPaymentController extends Controller
 {
@@ -62,9 +63,12 @@ class PixPaymentController extends Controller
             // Verificar se order já existe (idempotente)
             $existingOrder = Order::where('pix_payment_id', $payment->id)->first();
             if ($existingOrder) {
+                // Limpa o carrinho mesmo em chamadas repetidas
+                Session::forget('cart');
                 return response()->json([
                     'status' => 'already_paid',
                     'order' => $existingOrder->load('tickets'),
+                    'redirect' => route('profile.orders'),
                 ]);
             }
 
@@ -76,13 +80,16 @@ class PixPaymentController extends Controller
             ];
             $order = $this->orderService->createOrderFromPix($syntheticPixData);
 
+            // Limpa carrinho da sessão
+            Session::forget('cart');
+
             return response()->json([
                 'status' => 'paid',
                 'order' => $order,
+                'redirect' => route('profile.orders'),
             ]);
         } catch (\RuntimeException $e) {
             return response()->json(['error' => $e->getMessage()], 422);
         }
     }
 }
-

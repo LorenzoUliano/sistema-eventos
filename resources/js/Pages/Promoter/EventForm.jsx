@@ -1,45 +1,67 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PromoterLayout from "@/Layouts/PromoterLayout";
 import { Head, useForm, usePage } from "@inertiajs/react";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/Components/ui/button";
+import { Calendar } from "@/Components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/Components/ui/popover";
 import { FormSection } from "@/Components/eventFormComponents/FormSelection";
 import { EventBasicInfo } from "@/Components/eventFormComponents/EventBasicInfo";
 import { EventImageUpload } from "@/Components/eventFormComponents/EventImageUpload";
 import { EventLocation } from "@/Components/eventFormComponents/EventLocation";
 import { EventStatus } from "@/Components/eventFormComponents/EventStatus";
-import { CalendarIcon, Loader2 } from "lucide-react";
+import { CalendarIcon, Loader2, CheckCircle2 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 
 export default function EventForm({ event = null }) {
     const isEditing = event !== null;
     const { success } = usePage().props;
     const [message, setMessage] = useState(success || null);
-    
-    const { data, setData, post, put, processing, errors } = useForm({
+    const [startDate, setStartDate] = useState(event?.start_date ? new Date(event.start_date) : null);
+    const [endDate, setEndDate] = useState(event?.end_date ? new Date(event.end_date) : null);
+
+    const { data, setData, post, processing, errors } = useForm({
         name: event?.name || "",
         description: event?.description || "",
         image: null,
-        start_date: event?.start_date ? new Date(event.start_date) : null,
-        end_date: event?.end_date ? new Date(event.end_date) : null,
+        start_date: event?.start_date || "",
+        end_date: event?.end_date || "",
         location: event?.location || "",
         city: event?.city || "",
         state: event?.state || "",
         status: event?.status || "active",
+        _method: isEditing ? "PUT" : "POST",
     });
 
-    
-const handleDateChange = (date, field) => {
-    if (date) {
-        // Formata para MySQL DATETIME
-        const formattedDate = format(date, "yyyy-MM-dd HH:mm:ss");
-        setData(field, formattedDate);
-    } else {
-        setData(field, null);
-    }
-};
+    useEffect(() => {
+        if (success) {
+            setMessage(success);
+            const timer = setTimeout(() => setMessage(null), 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [success]);
+
+
+    const handleDateChange = (date, field) => {
+        if (date) {
+            const formattedDate = format(date, "yyyy-MM-dd HH:mm:ss");
+            setData(field, formattedDate);
+
+            if (field === "start_date") {
+                setStartDate(date);
+            } else {
+                setEndDate(date);
+            }
+        } else {
+            setData(field, "");
+            if (field === "start_date") {
+                setStartDate(null);
+            } else {
+                setEndDate(null);
+            }
+        }
+    };
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -52,77 +74,94 @@ const handleDateChange = (date, field) => {
             setData("image", file);
         }
     };
-    
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        const formData = new FormData();
-        Object.keys(data).forEach((key) => formData.append(key, data[key]));
-    
-        const request = isEditing 
-            ? put(route("promoter.event.update", { id: event.id }), { onSuccess: () => setMessage("Evento atualizado com sucesso!") })
-            : post(route("promoter.event.store"), { 
-                data: formData,
-                headers: { "Content-Type": "multipart/form-data" },
-                onSuccess: () => setMessage("Evento criado com sucesso!")
+
+        const submitData = {
+            ...data,
+            _method: isEditing ? "PUT" : "POST"
+        };
+
+        if (isEditing) {
+            post(route("promoter.event.update", { id: event.id }), {
+                forceFormData: true,
+                onSuccess: () => {
+                    setMessage("Evento atualizado com sucesso!");
+                }
             });
-    
-        request;
+        } else {
+            post(route("promoter.event.store"), {
+                forceFormData: true,
+                onSuccess: () => {
+                    setMessage("Evento criado com sucesso!");
+                }
+            });
+        }
     };
 
     return (
         <PromoterLayout>
             <Head title={isEditing ? `Editar ${event.name}` : "Criar Evento"} />
 
-            <div className="max-w-4xl mx-auto bg-card shadow-theme rounded-xl p-8 mt-10">
-                <div className="mb-8 space-y-1">
-                    <h1 className="text-3xl font-bold text-primary">
-                        {isEditing ? "Editar Evento" : "Novo Evento"}
-                    </h1>
-                    <p className="text-muted-foreground">
-                        {isEditing ? "Atualize os detalhes do seu evento" : "Preencha os dados para criar um novo evento"}
-                    </p>
-                </div>
-
-                {message && (
-                    <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700">
-                        {message}
+            <div className="container max-w-4xl mx-auto py-8 px-4">
+                <div className="bg-card shadow-lg rounded-xl border border-border overflow-hidden">
+                    {/* Header */}
+                    <div className="bg-gradient-to-r from-primary to-primary/80 p-6 md:p-8">
+                        <h1 className="text-3xl md:text-4xl font-bold text-secondary mb-2">
+                            {isEditing ? "Editar Evento" : "Novo Evento"}
+                        </h1>
+                        <p className="text-primary-foreground/90 text-sm md:text-base">
+                            {isEditing ? "Atualize os detalhes do seu evento" : "Preencha os dados para criar um novo evento"}
+                        </p>
                     </div>
-                )}
 
-                <form onSubmit={handleSubmit} className="space-y-8" encType="multipart/form-data">
-                    <div className="space-y-8">
+                    {/* Success Message */}
+                    {message && (
+                        <div className="mx-6 mt-6 p-4 bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 rounded-lg flex items-center gap-3 animate-in slide-in-from-top-2 duration-300">
+                            <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                            <p className="text-emerald-700 dark:text-emerald-300 font-medium">{message}</p>
+                        </div>
+                    )}
+
+                    {/* Form */}
+                    <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-8">
                         <FormSection title="Informações Básicas">
                             <EventBasicInfo data={data} errors={errors} setData={setData} />
                         </FormSection>
 
                         <FormSection title="Imagem do Evento">
-                            <EventImageUpload 
-                                event={event} 
-                                handleFileChange={handleFileChange} 
-                                errors={errors} 
+                            <EventImageUpload
+                                event={event}
+                                handleFileChange={handleFileChange}
+                                errors={errors}
                             />
                         </FormSection>
 
                         <FormSection title="Datas do Evento">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-primary">Data de Início</label>
+                                    <label className="text-sm font-medium text-foreground">Data de Início</label>
                                     <Popover>
                                         <PopoverTrigger asChild>
                                             <Button
+                                                type="button"
                                                 variant="outline"
-                                                className="w-full justify-start text-left font-normal"
+                                                className={cn(
+                                                    "w-full justify-start text-left font-normal",
+                                                    !startDate && "text-muted-foreground"
+                                                )}
                                             >
                                                 <CalendarIcon className="w-4 h-4 mr-2" />
-                                                {data.start_date ? 
-                                                    format(data.start_date, "PPP", { locale: ptBR }) : 
-                                                    "Selecione a data"}
+                                                {startDate ?
+                                                    format(startDate, "PPP 'às' HH:mm", { locale: ptBR }) :
+                                                    "Selecione a data de início"}
                                             </Button>
                                         </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-0">
+                                        <PopoverContent className="w-auto p-0" align="start">
                                             <Calendar
                                                 mode="single"
-                                                selected={data.start_date}
+                                                selected={startDate}
                                                 onSelect={(date) => handleDateChange(date, "start_date")}
                                                 initialFocus
                                             />
@@ -132,25 +171,30 @@ const handleDateChange = (date, field) => {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-primary">Data de Término</label>
+                                    <label className="text-sm font-medium text-foreground">Data de Término</label>
                                     <Popover>
                                         <PopoverTrigger asChild>
                                             <Button
+                                                type="button"
                                                 variant="outline"
-                                                className="w-full justify-start text-left font-normal"
+                                                className={cn(
+                                                    "w-full justify-start text-left font-normal",
+                                                    !endDate && "text-muted-foreground"
+                                                )}
                                             >
                                                 <CalendarIcon className="w-4 h-4 mr-2" />
-                                                {data.end_date ? 
-                                                    format(data.end_date, "PPP", { locale: ptBR }) : 
-                                                    "Selecione a data"}
+                                                {endDate ?
+                                                    format(endDate, "PPP 'às' HH:mm", { locale: ptBR }) :
+                                                    "Selecione a data de término"}
                                             </Button>
                                         </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-0">
+                                        <PopoverContent className="w-auto p-0" align="start">
                                             <Calendar
                                                 mode="single"
-                                                selected={data.end_date}
+                                                selected={endDate}
                                                 onSelect={(date) => handleDateChange(date, "end_date")}
                                                 initialFocus
+                                                disabled={(date) => startDate && date < startDate}
                                             />
                                         </PopoverContent>
                                     </Popover>
@@ -160,29 +204,35 @@ const handleDateChange = (date, field) => {
                         </FormSection>
 
                         <FormSection title="Localização">
-                            <EventLocation data={data} setData={setData} />
+                            <EventLocation data={data} errors={errors} setData={setData} />
                         </FormSection>
 
                         <FormSection title="Status do Evento">
                             <EventStatus data={data} setData={setData} />
                         </FormSection>
-                    </div>
 
-                    <Button
-                        type="submit"
-                        className="w-full h-12 text-white bg-primary hover:bg-primary/90 transition-all"
-                        disabled={processing}
-                    >
-                        {processing ? (
-                            <div className="flex items-center gap-2">
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                                {isEditing ? "Salvando..." : "Criando..."}
-                            </div>
-                        ) : (
-                            isEditing ? "Salvar Alterações" : "Criar Evento"
-                        )}
-                    </Button>
-                </form>
+                        {/* Submit Button */}
+                        <div className="pt-6 border-t border-border">
+                            <Button
+                                type="submit"
+                                className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/90 transition-all shadow-md hover:shadow-lg"
+                                disabled={processing}
+                            >
+                                {processing ? (
+                                    <div className="flex items-center gap-2">
+                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                        {isEditing ? "Salvando alterações..." : "Criando evento..."}
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center gap-2">
+                                        <CheckCircle2 className="w-5 h-5" />
+                                        {isEditing ? "Salvar Alterações" : "Criar Evento"}
+                                    </div>
+                                )}
+                            </Button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </PromoterLayout>
     );

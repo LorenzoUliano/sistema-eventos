@@ -1,5 +1,5 @@
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Input } from "@/Components/ui/input";
+import { Label } from "@/Components/ui/label";
 
 export const EventDates = ({ data, setData }) => (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

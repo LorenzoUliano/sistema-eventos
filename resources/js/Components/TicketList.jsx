@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 
 export default function TicketList({ tickets }) {
     if (!tickets || tickets.length === 0) {
@@ -19,13 +19,12 @@ export default function TicketList({ tickets }) {
                         <CardTitle className="text-base">{ticket.name}</CardTitle>
                     </CardHeader>
                     <CardContent className="flex justify-between items-center p-3 pt-1">
-                        <div className="space-y-0.5">
-                            <p className="text-xs text-muted-foreground">
-                                Quantidade: {ticket.quantity}
-                            </p>
+                        <div className="space-y-0.5 text-xs text-muted-foreground">
+                            <p>Qtd: {ticket.quantity}</p>
+                            <p>Unitário: R$ {parseFloat(ticket.unit_price ?? ticket.price).toFixed(2)}</p>
                         </div>
                         <p className="text-lg font-semibold text-primary">
-                            R$ {parseFloat(ticket.price).toFixed(2)}
+                            R$ {parseFloat(ticket.line_total ?? (ticket.price * ticket.quantity)).toFixed(2)}
                         </p>
                     </CardContent>
                 </Card>

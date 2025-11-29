@@ -3,38 +3,87 @@
 namespace App\Http\Controllers;
 
 use App\Models\OrderTicket;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 use Illuminate\Http\Request;
 
 class OrderTicketController extends Controller
 {
-    public function index()
+    /**
+     * Verifica se o usuário autenticado pode visualizar/validar este ingresso.
+     */
+    protected function authorizeView(OrderTicket $orderTicket): void
     {
-        $orderTickets = OrderTicket::all();
-        return response()->json($orderTickets);
+        if ($orderTicket->user_id !== Auth::id()) {
+            abort(403, 'Não autorizado a visualizar este ingresso.');
+        }
     }
 
-    public function store(Request $request)
+    /**
+     * Página com os dados do ingresso e QR Code de validação.
+     */
+    public function show(string $id)
     {
-        $request->validate([
-            'order_id' => 'required|exists:orders,id',
-            'ticket_id' => 'required|exists:tickets,id',
-            'quantity' => 'required|integer|min:1',
-            'total_price' => 'required|numeric|min:0',
+        $orderTicket = OrderTicket::with(['order.tickets', 'ticket.event'])->findOrFail($id);
+        $this->authorizeView($orderTicket);
+
+        $scanUrl = rtrim(config('app.url'), '/') . '/order-tickets/' . $orderTicket->id . '/scan';
+
+        return Inertia::render('OrderTicket/Show', [
+            'orderTicket' => [
+                'id' => $orderTicket->id,
+                'status' => $orderTicket->status,
+                'quantity' => $orderTicket->quantity,
+                'total_price' => $orderTicket->total_price,
+                'scan_url' => $scanUrl,
+                'ticket' => $orderTicket->ticket ? [
+                    'id' => $orderTicket->ticket->id,
+                    'name' => $orderTicket->ticket->name,
+                    'event' => $orderTicket->ticket->event ? [
+                        'id' => $orderTicket->ticket->event->id,
+                        'name' => $orderTicket->ticket->event->name,
+                    ] : null,
+                ] : null,
+            ],
         ]);
-
-        $orderTicket = OrderTicket::create($request->all());
-        return response()->json($orderTicket, 201);
     }
 
-    public function show($id)
+    /**
+     * Validação via leitura do QR (GET). Idempotente.
+     */
+    public function scan(string $id)
     {
         $orderTicket = OrderTicket::findOrFail($id);
-        return response()->json($orderTicket);
+        $this->authorizeView($orderTicket);
+
+        if ($orderTicket->status === 'validated') {
+            return response()->json([
+                'status' => 'already_validated',
+                'order_ticket_id' => $orderTicket->id,
+            ]);
+        }
+
+        if ($orderTicket->status !== 'paid') {
+            return response()->json([
+                'status' => 'invalid_state',
+                'current' => $orderTicket->status,
+            ], 422);
+        }
+
+        $orderTicket->status = 'validated';
+        $orderTicket->save();
+
+        return response()->json([
+            'status' => 'validated',
+            'order_ticket_id' => $orderTicket->id,
+        ]);
     }
 
-    public function destroy($id)
+    /**
+     * Validação manual (POST) reutiliza a lógica do scan.
+     */
+    public function validateManual(string $id)
     {
-        OrderTicket::destroy($id);
-        return response()->json(['message' => 'Order ticket deleted']);
+        return $this->scan($id);
     }
 }

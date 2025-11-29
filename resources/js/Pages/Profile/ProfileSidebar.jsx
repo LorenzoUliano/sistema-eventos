@@ -1,7 +1,7 @@
 import { Link, router, usePage } from '@inertiajs/react';
 import { route } from 'ziggy-js';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/Components/ui/card';
+import { Button } from '@/Components/ui/button';
 import {
     User,
     ShoppingBag,

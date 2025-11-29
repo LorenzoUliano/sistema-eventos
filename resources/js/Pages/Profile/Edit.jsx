@@ -1,7 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
+import { Button } from '@/Components/ui/button';
 import { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
@@ -19,7 +19,7 @@ export default function ProfileEdit({ mustVerifyEmail, status }) {
             <div className="container mx-auto px-4 py-8 max-w-7xl">
                 <div className="flex flex-col lg:flex-row gap-8">
                     {/* Menu Lateral */}
-                    <ProfileSidebar 
+                    <ProfileSidebar
                         activeKey={activeKey}
                         isMobileMenuOpen={isMobileMenuOpen}
                         setIsMobileMenuOpen={setIsMobileMenuOpen}

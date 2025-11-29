@@ -1,9 +1,9 @@
 import { useState, useRef } from 'react';
 import { useForm } from '@inertiajs/react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
+import { Label } from '@/Components/ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/Components/ui/dialog';
 
 export default function DeleteUserForm() {
     const [open, setOpen] = useState(false);
@@ -37,7 +37,7 @@ export default function DeleteUserForm() {
                         </p>
 
                         <Label htmlFor="password">Senha</Label>
-                        <Input id="password" type="password" ref={passwordInput} value={data.password} 
+                        <Input id="password" type="password" ref={passwordInput} value={data.password}
                             onChange={(e) => setData('password', e.target.value)} />
 
                         {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}

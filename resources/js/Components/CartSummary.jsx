@@ -1,14 +1,14 @@
-// components/CartSummary.jsx
+// Components/CartSummary.jsx
 import React, { useState } from "react";
 import { ChevronUp, ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { useCart } from "@/contexts/cart-context";
+import { Button } from "@/Components/ui/button";
+import { Card } from "@/Components/ui/card";
+import { useCart } from "@/Contexts/cart-context";
 import {
     Collapsible,
     CollapsibleTrigger,
     CollapsibleContent,
-} from "@/components/ui/collapsible";
+} from "@/Components/ui/collapsible";
 
 export const CartSummary = ({ eventId }) => {
     const { cartItems, getEventTotal, clearCart, handleContinueCart } = useCart();

@@ -4,7 +4,7 @@ import './bootstrap';
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
-import { CartProvider } from '@/contexts/cart-context.jsx';
+import {CartProvider} from "@/Contexts/cart-context.jsx";
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 

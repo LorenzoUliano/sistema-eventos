@@ -24,8 +24,12 @@ class TicketDTO
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'price' => $this->price * $this->selected_quantity,
+            // unit price
+            'price' => $this->price,
+            'unit_price' => $this->price,
             'quantity' => $this->selected_quantity,
+            // pre-calculated line total for convenience
+            'line_total' => $this->price * $this->selected_quantity,
         ];
     }
 }

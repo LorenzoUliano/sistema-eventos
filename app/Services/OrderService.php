@@ -25,11 +25,13 @@ class OrderService
         $ticketsRequested = [];
         foreach ($purchaseData['tickets'] as $t) {
             $ticketModel = Ticket::findOrFail($t['ticketTypeId']);
-            $lineTotal = $ticketModel->price * $t['quantity'];
+            $quantity = max(1, (int) ($t['quantity'] ?? 1));
+
+            $lineTotal = $ticketModel->price * $quantity;
             $recalculatedTotal += $lineTotal;
             $ticketsRequested[] = [
                 'model' => $ticketModel,
-                'quantity' => $t['quantity'],
+                'quantity' => $quantity,
                 'line_total' => $lineTotal,
             ];
         }
@@ -53,14 +55,18 @@ class OrderService
             ]);
 
             foreach ($ticketsRequested as $tr) {
-                OrderTicket::create([
-                    'order_id' => $order->id,
-                    'ticket_id' => $tr['model']->id,
-                    'quantity' => $tr['quantity'],
-                    'total_price' => $tr['line_total'],
-                    'user_id' => $purchaseData['userId'],
-                    'status' => 'paid',
-                ]);
+                // A migration de order_tickets não possui quantity nem total_price,
+                // apenas unit_price. Para representar a quantidade, criamos
+                // vários registros OrderTicket quando quantity > 1.
+                for ($i = 0; $i < $tr['quantity']; $i++) {
+                    OrderTicket::create([
+                        'order_id' => $order->id,
+                        'ticket_id' => $tr['model']->id,
+                        'unit_price' => $tr['model']->price,
+                        'user_id' => $purchaseData['userId'],
+                        'status' => 'paid',
+                    ]);
+                }
             }
 
             return $order->load('tickets');

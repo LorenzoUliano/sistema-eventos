@@ -1,9 +1,9 @@
 import { Link, router, usePage } from '@inertiajs/react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
+import { Badge } from '@/Components/ui/badge';
+import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@/Components/ui/popover';
 import { useState, useMemo } from 'react';
 import {
     ShoppingBag,
@@ -298,6 +298,7 @@ export default function OrdersContent() {
                                     const isNew = isNewOrder(order.created_at);
                                     const hasIssues = order.status === "pending" &&
                                         new Date(order.created_at) < new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+                                    const firstTicketPivotId = order.tickets && order.tickets.length > 0 ? order.tickets[0].pivot.id : null;
 
                                     return (
                                         <Card
@@ -368,6 +369,13 @@ export default function OrdersContent() {
                                                             Ver detalhes
                                                         </Button>
                                                     </Link>
+                                                    {firstTicketPivotId && (
+                                                        <Link href={route('orderTicket.show', firstTicketPivotId)}>
+                                                            <Button variant="secondary" size="sm" title="Ver QR do ingresso">
+                                                                QR Code
+                                                            </Button>
+                                                        </Link>
+                                                    )}
                                                     {order.status === "pending" && (
                                                         <Button
                                                             variant="destructive"
@@ -478,4 +486,3 @@ export default function OrdersContent() {
         </div>
     );
 }
-

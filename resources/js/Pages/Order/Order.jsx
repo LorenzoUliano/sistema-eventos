@@ -1,10 +1,10 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, usePage, Link, router } from "@inertiajs/react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/Components/ui/card";
+import { Badge } from "@/Components/ui/badge";
+import { Button } from "@/Components/ui/button";
+import { Input } from "@/Components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/Components/ui/popover";
 import { useState, useMemo } from "react";
 import {
     ShoppingBag,
@@ -120,17 +120,13 @@ export default function Order() {
                 case "old":
                     return new Date(a.created_at) - new Date(b.created_at);
                 case "high": {
-                    const totalA = a.tickets?.reduce((sum, ticket) =>
-                        sum + (parseFloat(ticket.pivot?.total_price) || 0), 0) || 0;
-                    const totalB = b.tickets?.reduce((sum, ticket) =>
-                        sum + (parseFloat(ticket.pivot?.total_price) || 0), 0) || 0;
+                    const totalA = a.order_tickets?.reduce((sum, ot) => sum + (parseFloat(ot.unit_price) || 0), 0) || 0;
+                    const totalB = b.order_tickets?.reduce((sum, ot) => sum + (parseFloat(ot.unit_price) || 0), 0) || 0;
                     return totalB - totalA;
                 }
                 case "low": {
-                    const totalA = a.tickets?.reduce((sum, ticket) =>
-                        sum + (parseFloat(ticket.pivot?.total_price) || 0), 0) || 0;
-                    const totalB = b.tickets?.reduce((sum, ticket) =>
-                        sum + (parseFloat(ticket.pivot?.total_price) || 0), 0) || 0;
+                    const totalA = a.order_tickets?.reduce((sum, ot) => sum + (parseFloat(ot.unit_price) || 0), 0) || 0;
+                    const totalB = b.order_tickets?.reduce((sum, ot) => sum + (parseFloat(ot.unit_price) || 0), 0) || 0;
                     return totalA - totalB;
                 }
                 default:
@@ -365,13 +361,8 @@ export default function Order() {
                             {!isLoading && filteredAndSortedOrders && filteredAndSortedOrders.length > 0 ? (
                                 <div className="space-y-4">
                                     {filteredAndSortedOrders.map((order) => {
-                                        const orderTotal = order.tickets?.reduce((sum, ticket) => {
-                                            return sum + (parseFloat(ticket.pivot?.total_price) || 0);
-                                        }, 0) || 0;
-
-                                        const totalTickets = order.tickets?.reduce((sum, ticket) => {
-                                            return sum + (parseInt(ticket.pivot?.quantity) || 0);
-                                        }, 0) || 0;
+                                        const orderTotal = order.order_tickets?.reduce((sum, ot) => sum + (parseFloat(ot.unit_price) || 0), 0) || 0;
+                                        const totalTickets = order.order_tickets?.length || 0;
 
                                         const eventName = getEventName(order);
                                         const isNew = isNewOrder(order.created_at);
@@ -379,10 +370,7 @@ export default function Order() {
                                             new Date(order.created_at) < new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
                                         return (
-                                            <Card
-                                                key={order.id}
-                                                className="hover:shadow-lg transition-all hover:border-primary/50 relative"
-                                            >
+                                            <Card key={order.id} className="hover:shadow-lg transition-all hover:border-primary/50 relative">
                                                 <CardHeader>
                                                     <div className="flex items-start justify-between">
                                                         <div className="flex-1">
@@ -438,22 +426,44 @@ export default function Order() {
                                                             </p>
                                                         </div>
                                                     </div>
-                                                    <div className="flex items-center gap-2 pt-4 border-t">
-                                                        <Link
-                                                            href={`/orders/${order.id}`}
-                                                            className="flex-1"
-                                                        >
+
+                                                    {/* Lista de cada order_ticket com botão */}
+                                                    {order.order_tickets && order.order_tickets.length > 0 && (
+                                                        <div className="space-y-3 border-t pt-4">
+                                                            {order.order_tickets.map((ot) => (
+                                                                <div key={ot.id} className="flex items-center justify-between p-3 border rounded-md">
+                                                                    <div className="flex items-center gap-3">
+                                                                        <Ticket className="w-4 h-4 text-muted-foreground" />
+                                                                        <div className="text-sm">
+                                                                            <div className="font-medium">Ingresso #{ot.id}</div>
+                                                                            <div className="text-muted-foreground">Preço: {formatCurrency(parseFloat(ot.unit_price) || 0)}</div>
+                                                                            <div className="text-muted-foreground">Status: {ot.status}</div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-2">
+                                                                        <Button variant="outline" size="sm" onClick={() => router.get(`/orders/${order.id}`)}>
+                                                                            Ver detalhes
+                                                                        </Button>
+                                                                        {/* Exemplo de ação por ticket: validar ou cancelar */}
+                                                                        {order.status === "paid" && (
+                                                                            <Button variant="secondary" size="sm" onClick={() => alert(`Ação para order_ticket ${ot.id}`)}>
+                                                                                Ação
+                                                                            </Button>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
+
+                                                    <div className="flex items-center gap-2 pt-4">
+                                                        <Link href={`/orders/${order.id}`} className="flex-1">
                                                             <Button variant="outline" className="w-full">
                                                                 Ver detalhes
                                                             </Button>
                                                         </Link>
                                                         {order.status === "pending" && (
-                                                            <Button
-                                                                variant="destructive"
-                                                                size="sm"
-                                                                onClick={(e) => handleCancelOrder(order.id, e)}
-                                                                title="Cancelar pedido"
-                                                            >
+                                                            <Button variant="destructive" size="sm" onClick={(e) => handleCancelOrder(order.id, e)} title="Cancelar pedido">
                                                                 <X className="w-4 h-4" />
                                                             </Button>
                                                         )}

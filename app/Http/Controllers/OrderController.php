@@ -13,37 +13,37 @@ class OrderController extends Controller
     {
         $orders = Order::userOrders();
 
-        // Calcular estatísticas
+        // Total gasto: soma de unit_price em order_tickets
         $totalOrders = $orders->count();
         $totalSpent = $orders->flatMap(function ($order) {
-            return $order->tickets->map(function ($ticket) {
-                return $ticket->pivot->total_price ?? 0;
+            return $order->orderTickets->map(function ($ot) {
+                return (float) ($ot->unit_price ?? 0);
             });
         })->sum();
 
         $paidOrders = $orders->where('status', 'paid')->count();
         $pendingOrders = $orders->where('status', 'pending')->count();
 
-        // Eventos mais visitados (baseado em tickets comprados)
+        // Eventos mais visitados (com base nos tickets comprados via order_tickets)
         $eventCounts = [];
         foreach ($orders as $order) {
-            foreach ($order->tickets as $ticket) {
-                // Buscar o evento se não estiver carregado
-                if (!$ticket->relationLoaded('event') && $ticket->event_id) {
-                    $ticket->load('event.company');
+            foreach ($order->orderTickets as $ot) {
+                // Garantir que ticket e evento estejam carregados
+                if (!$ot->relationLoaded('ticket') || !$ot->ticket) {
+                    $ot->load('ticket.event.company');
                 }
-
-                if ($ticket->event) {
+                $ticket = $ot->ticket;
+                if ($ticket && $ticket->event) {
                     $eventId = $ticket->event->id;
                     if (!isset($eventCounts[$eventId])) {
                         $eventCounts[$eventId] = [
                             'event' => $ticket->event,
                             'count' => 0,
-                            'total_spent' => 0
+                            'total_spent' => 0,
                         ];
                     }
-                    $eventCounts[$eventId]['count'] += $ticket->pivot->quantity ?? 1;
-                    $eventCounts[$eventId]['total_spent'] += $ticket->pivot->total_price ?? 0;
+                    $eventCounts[$eventId]['count'] += 1; // cada order_ticket representa 1 ingresso
+                    $eventCounts[$eventId]['total_spent'] += (float) ($ot->unit_price ?? 0);
                 }
             }
         }
@@ -79,7 +79,7 @@ class OrderController extends Controller
     public function show($id)
     {
         $order = Order::where('user_id', Auth::id())
-            ->with(['tickets.event.company'])
+            ->with(['orderTickets.ticket.event.company'])
             ->findOrFail($id);
 
         return Inertia::render('Order/OrderDetails', [

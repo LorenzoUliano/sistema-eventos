@@ -1,6 +1,6 @@
 import React from "react";
 import { usePage } from "@inertiajs/react";
-import Navbar from "@/Components/Navbar";
+import Navbar from "@/Components/NavBar";
 
 export default function PromoterLayout({ children }) {
     const { auth } = usePage().props;
