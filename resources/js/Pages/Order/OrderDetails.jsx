@@ -302,112 +302,149 @@ export default function OrderDetails({ order }) {
                     </Card>
                 </div>
 
+                {/* Informações do Evento */}
+                {order?.order_tickets?.[0]?.ticket?.event && (
+                    <Card className="mb-6">
+                        <CardHeader>
+                            <CardTitle className="text-2xl">{order.order_tickets[0].ticket.event.name}</CardTitle>
+                            <CardDescription>
+                                Detalhes do evento
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                {/* Imagem do Evento */}
+                                {order.order_tickets[0].ticket.event.image_url && (
+                                    <div className="rounded-xl overflow-hidden border border-border">
+                                        <img
+                                            src={order.order_tickets[0].ticket.event.image_url}
+                                            alt={order.order_tickets[0].ticket.event.name}
+                                            className="w-full h-64 lg:h-full object-cover"
+                                        />
+                                    </div>
+                                )}
+
+                                {/* Informações do Evento */}
+                                <div className="space-y-4">
+                                    {order.order_tickets[0].ticket.event.description && (
+                                        <div>
+                                            <h4 className="font-semibold mb-2">Sobre o Evento</h4>
+                                            <p className="text-sm text-muted-foreground leading-relaxed">
+                                                {order.order_tickets[0].ticket.event.description}
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    <div className="space-y-3">
+                                        {order.order_tickets[0].ticket.event.start_date && (
+                                            <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
+                                                <Calendar className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                                                <div>
+                                                    <p className="text-sm font-medium">Data e Hora</p>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        {new Date(order.order_tickets[0].ticket.event.start_date).toLocaleDateString('pt-BR', {
+                                                            weekday: 'long',
+                                                            day: '2-digit',
+                                                            month: 'long',
+                                                            year: 'numeric'
+                                                        })}
+                                                    </p>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        {new Date(order.order_tickets[0].ticket.event.start_date).toLocaleTimeString('pt-BR', {
+                                                            hour: '2-digit',
+                                                            minute: '2-digit'
+                                                        })}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {order.order_tickets[0].ticket.event.city && (
+                                            <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
+                                                <MapPin className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                                                <div>
+                                                    <p className="text-sm font-medium">Local</p>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        {order.order_tickets[0].ticket.event.location || order.order_tickets[0].ticket.event.city}
+                                                    </p>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        {order.order_tickets[0].ticket.event.city}
+                                                        {order.order_tickets[0].ticket.event.state && ` - ${order.order_tickets[0].ticket.event.state}`}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {order.order_tickets[0].ticket.event.company && (
+                                            <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
+                                                <Building className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                                                <div>
+                                                    <p className="text-sm font-medium">Organizador</p>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        {order.order_tickets[0].ticket.event.company.name}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
+
                 {/* Detalhes dos Ingressos */}
                 <Card className="mb-6">
                     <CardHeader>
-                        <CardTitle>Detalhes dos Ingressos</CardTitle>
+                        <CardTitle>Seus Ingressos ({totalTickets})</CardTitle>
                         <CardDescription>
-                            Informações completas sobre os ingressos deste pedido
+                            Clique em cada ingresso para ver o QR Code
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
                         {order?.order_tickets && order.order_tickets.length > 0 ? (
-                            <div className="space-y-4">
-                                {order.order_tickets.map((ot) => (
-                                    <div key={ot.id} className="p-4 border rounded-lg space-y-4 transition-all hover:shadow-md">
-                                        {/* Informações do Evento */}
-                                        {ot.ticket?.event ? (
-                                            <div className="space-y-3">
-                                                <div>
-                                                    <h3 className="font-semibold text-lg mb-2">
-                                                        {ot.ticket.event.name}
-                                                    </h3>
-                                                    {ot.ticket.event.description && (
-                                                        <p className="text-sm text-muted-foreground line-clamp-2">
-                                                            {ot.ticket.event.description}
-                                                        </p>
-                                                    )}
-                                                </div>
-
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                                                    {ot.ticket.event.start_date && (
-                                                        <div className="flex items-center gap-2 text-muted-foreground">
-                                                            <Calendar className="w-4 h-4" />
-                                                            <span>
-                                                                {new Date(ot.ticket.event.start_date).toLocaleDateString('pt-BR', {
-                                                                    weekday: 'long',
-                                                                    day: '2-digit',
-                                                                    month: 'long',
-                                                                    year: 'numeric',
-                                                                    hour: '2-digit',
-                                                                    minute: '2-digit'
-                                                                })}
-                                                            </span>
-                                                        </div>
-                                                    )}
-                                                    {ot.ticket.event.city && (
-                                                        <div className="flex items-center gap-2 text-muted-foreground">
-                                                            <MapPin className="w-4 h-4" />
-                                                            <span>
-                                                                {ot.ticket.event.city}
-                                                                {ot.ticket.event.state && ` - ${ot.ticket.event.state}`}
-                                                            </span>
-                                                        </div>
-                                                    )}
-                                                    {ot.ticket.event.company && (
-                                                        <div className="flex items-center gap-2 text-muted-foreground">
-                                                            <Building className="w-4 h-4" />
-                                                            <span>{ot.ticket.event.company.name}</span>
-                                                        </div>
-                                                    )}
-                                                </div>
-
-                                                {ot.ticket.event.image_url && (
-                                                    <div className="rounded-lg overflow-hidden">
-                                                        <img
-                                                            src={ot.ticket.event.image_url}
-                                                            alt={ot.ticket.event.name}
-                                                            className="w-full h-48 object-cover"
-                                                        />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {order.order_tickets.map((ot, index) => (
+                                    <Link key={ot.id} href={`/order-tickets/${ot.id}`}>
+                                        <div className="p-4 border-2 border-border rounded-xl hover:border-primary hover:shadow-lg transition-all cursor-pointer bg-card h-full">
+                                            <div className="flex items-start justify-between mb-3">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="p-2 bg-primary/10 rounded-lg">
+                                                        <Ticket className="w-5 h-5 text-primary" />
                                                     </div>
-                                                )}
+                                                    <div>
+                                                        <p className="font-semibold">Ingresso #{index + 1}</p>
+                                                        <p className="text-sm text-muted-foreground">ID: {ot.id}</p>
+                                                    </div>
+                                                </div>
+                                                <Badge variant={ot.status === 'paid' ? 'default' : ot.status === 'validated' ? 'secondary' : 'outline'}>
+                                                    {ot.status === 'paid' ? 'Pago' : ot.status === 'validated' ? 'Validado' : ot.status}
+                                                </Badge>
                                             </div>
-                                        ) : (
-                                            <div className="text-sm text-muted-foreground">
-                                                Informações do evento não disponíveis
-                                            </div>
-                                        )}
 
-                                        {/* Informações do Ingresso */}
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                            <div>
-                                                <p className="text-sm text-muted-foreground">Ingresso</p>
-                                                <p className="font-semibold">#{ot.id}</p>
+                                            <div className="space-y-2">
+                                                <div className="flex justify-between items-center py-2 border-t border-border/50">
+                                                    <span className="text-sm text-muted-foreground">Tipo</span>
+                                                    <span className="text-sm font-semibold">{ot.ticket?.name || 'Ingresso'}</span>
+                                                </div>
+                                                <div className="flex justify-between items-center py-2 border-t border-border/50">
+                                                    <span className="text-sm text-muted-foreground">Valor</span>
+                                                    <span className="text-sm font-bold text-primary">
+                                                        {formatCurrency(parseFloat(ot.unit_price) || 0)}
+                                                    </span>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <p className="text-sm text-muted-foreground">Preço</p>
-                                                <p className="font-semibold">{formatCurrency(parseFloat(ot.unit_price) || 0)}</p>
-                                            </div>
-                                            <div>
-                                                <p className="text-sm text-muted-foreground">Status</p>
-                                                <p className="font-semibold">{ot.status}</p>
+
+                                            <div className="mt-4 pt-3 border-t border-border/50 flex items-center justify-center gap-2 text-sm text-primary font-medium">
+                                                <Ticket className="w-4 h-4" />
+                                                Clique para ver QR Code
                                             </div>
                                         </div>
-
-                                        {/* Ações por ingresso */}
-                                        <div className="flex items-center gap-2">
-                                            <Link href={`/order-tickets/${ot.id}`} className="flex-1">
-                                                <Button variant="default" className="w-full gap-2">
-                                                    <Ticket className="w-4 h-4" />
-                                                    Ver QR Code do Ingresso
-                                                </Button>
-                                            </Link>
-                                        </div>
-                                    </div>
+                                    </Link>
                                 ))}
                             </div>
                         ) : (
-                            <p className="text-sm text-muted-foreground">Nenhum ingresso encontrado</p>
+                            <p className="text-sm text-muted-foreground text-center py-8">Nenhum ingresso encontrado</p>
                         )}
                     </CardContent>
                 </Card>
