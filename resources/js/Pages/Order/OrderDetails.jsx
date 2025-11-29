@@ -396,14 +396,12 @@ export default function OrderDetails({ order }) {
 
                                         {/* Ações por ingresso */}
                                         <div className="flex items-center gap-2">
-                                            <Button variant="outline" size="sm" onClick={() => router.get(`/orders/${order.id}`)}>
-                                                Ver detalhes do pedido
-                                            </Button>
-                                            {order?.status === 'paid' && (
-                                                <Button variant="secondary" size="sm" onClick={() => alert(`Ação para order_ticket ${ot.id}`)}>
-                                                    Ação
+                                            <Link href={`/order-tickets/${ot.id}`} className="flex-1">
+                                                <Button variant="default" className="w-full gap-2">
+                                                    <Ticket className="w-4 h-4" />
+                                                    Ver QR Code do Ingresso
                                                 </Button>
-                                            )}
+                                            </Link>
                                         </div>
                                     </div>
                                 ))}

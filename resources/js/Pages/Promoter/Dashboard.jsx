@@ -24,7 +24,8 @@ import {
     Clock,
     CheckCircle2,
     XCircle,
-    AlertCircle
+    AlertCircle,
+    ScanLine
 } from "lucide-react";
 import { format, parseISO, differenceInDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -155,6 +156,14 @@ const EventCard = ({ event }) => {
     const salesPercentage = totalTickets > 0 ? ((soldTickets / totalTickets) * 100).toFixed(1) : "0.0";
     const daysUntilEvent = differenceInDays(parseISO(event.start_date), new Date());
 
+    // Calcular ingressos validados (pessoas que entraram)
+    const validatedTickets = event.tickets.reduce((acc, ticket) => {
+        const validated = parseInt(ticket.validated) || 0;
+        return acc + validated;
+    }, 0);
+
+    const validationPercentage = soldTickets > 0 ? ((validatedTickets / soldTickets) * 100).toFixed(1) : "0.0";
+
     return (
         <div className="bg-card rounded-xl border border-border shadow-sm hover:shadow-md transition-shadow group">
             <div className="relative aspect-video overflow-hidden rounded-t-xl">
@@ -217,7 +226,9 @@ const EventCard = ({ event }) => {
                             totalRevenue,
                             potentialRevenue,
                             salesPercentage,
-                            daysUntilEvent
+                            daysUntilEvent,
+                            validatedTickets,
+                            validationPercentage
                         }} />
                     </Dialog>
 
@@ -364,6 +375,56 @@ const EventDetailsModal = ({ event, stats }) => {
                     </div>
                 </div>
 
+                {/* Estatísticas de Entrada/Validação */}
+                <div className="space-y-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                        <CheckCircle2 className="w-5 h-5 text-blue-600" />
+                        Controle de Entrada
+                    </h3>
+
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <StatCard
+                            label="Já Entraram"
+                            value={stats.validatedTickets}
+                            icon={<CheckCircle2 className="w-5 h-5 text-blue-600" />}
+                            color="text-blue-600"
+                        />
+                        <StatCard
+                            label="Ainda Não Entraram"
+                            value={stats.soldTickets - stats.validatedTickets}
+                            icon={<Clock className="w-5 h-5 text-amber-600" />}
+                            color="text-amber-600"
+                        />
+                        <StatCard
+                            label="Taxa de Entrada"
+                            value={`${stats.validationPercentage}%`}
+                            icon={<TrendingUp className="w-5 h-5 text-purple-600" />}
+                            color="text-purple-600"
+                        />
+                    </div>
+
+                    {/* Barra de Progresso de Entrada */}
+                    <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">
+                                Progresso de Entrada ({stats.validatedTickets} de {stats.soldTickets} vendidos)
+                            </span>
+                            <span className="font-semibold text-blue-600">{stats.validationPercentage}%</span>
+                        </div>
+                        <div className="w-full bg-muted rounded-full h-3 overflow-hidden">
+                            <div
+                                className="bg-gradient-to-r from-blue-500 to-purple-500 h-full transition-all duration-500"
+                                style={{ width: `${stats.validationPercentage}%` }}
+                            />
+                        </div>
+                        <p className="text-xs text-muted-foreground text-center mt-2">
+                            {stats.soldTickets - stats.validatedTickets > 0
+                                ? `${stats.soldTickets - stats.validatedTickets} pessoas ainda não chegaram`
+                                : 'Todos os ingressos vendidos foram validados!'}
+                        </p>
+                    </div>
+                </div>
+
                 {/* Receita */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gradient-to-r from-primary/5 to-primary/10 rounded-lg border border-primary/20">
                     <div className="space-y-1">
@@ -400,17 +461,23 @@ const EventDetailsModal = ({ event, stats }) => {
                 </div>
 
                 {/* Ações Rápidas */}
-                <div className="flex gap-2 pt-4 border-t border-border">
-                    <Link href={route("promoter.event.manage", event.id)} className="flex-1">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-2 pt-4 border-t border-border">
+                    <Link href={route("promoter.event.manage", event.id)}>
                         <Button variant="outline" className="w-full gap-2">
                             <Settings className="w-4 h-4" />
                             Editar Evento
                         </Button>
                     </Link>
-                    <Link href={route("promoter.event.tickets", event.id)} className="flex-1">
-                        <Button className="w-full gap-2">
+                    <Link href={route("promoter.event.tickets", event.id)}>
+                        <Button variant="outline" className="w-full gap-2">
                             <Ticket className="w-4 h-4" />
                             Gerenciar Ingressos
+                        </Button>
+                    </Link>
+                    <Link href={route("promoter.event.validate", event.id)}>
+                        <Button className="w-full gap-2 bg-primary hover:bg-primary/90">
+                            <ScanLine className="w-4 h-4" />
+                            Validar Ingressos
                         </Button>
                     </Link>
                 </div>
@@ -449,8 +516,10 @@ const TicketItem = ({ ticket }) => {
     const sold = parseInt(ticket.sold) || 0;
     const quantity = parseInt(ticket.quantity) || 0;
     const price = parseFloat(ticket.price) || 0;
+    const validated = parseInt(ticket.validated) || 0;
     const available = Math.max(0, quantity - sold);
     const percentage = quantity > 0 ? ((sold / quantity) * 100).toFixed(0) : 0;
+    const validatedPercentage = sold > 0 ? ((validated / sold) * 100).toFixed(0) : 0;
     const revenue = (sold * price).toFixed(2);
 
     return (
@@ -467,22 +536,57 @@ const TicketItem = ({ ticket }) => {
                 </Badge>
             </div>
 
-            <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">
-                        {sold} vendidos de {quantity}
+            <div className="space-y-3">
+                {/* Vendas */}
+                <div>
+                    <div className="flex justify-between text-sm mb-1">
+                        <span className="text-muted-foreground">Vendas</span>
+                        <span className="font-semibold text-primary">{percentage}%</span>
+                    </div>
+                    <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                        <span>{sold} vendidos de {quantity}</span>
+                        <span>{available} disponíveis</span>
+                    </div>
+                    <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+                        <div
+                            className="bg-primary h-full transition-all duration-300"
+                            style={{ width: `${percentage}%` }}
+                        />
+                    </div>
+                </div>
+
+                {/* Entrada/Validação */}
+                {sold > 0 && (
+                    <div className="pt-2 border-t border-border/50">
+                        <div className="flex justify-between text-sm mb-1">
+                            <span className="text-muted-foreground flex items-center gap-1">
+                                <CheckCircle2 className="w-3 h-3" />
+                                Entrada
+                            </span>
+                            <span className="font-semibold text-blue-600">{validatedPercentage}%</span>
+                        </div>
+                        <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                            <span className="text-blue-600">{validated} já entraram</span>
+                            <span className="text-amber-600">{sold - validated} aguardando</span>
+                        </div>
+                        <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+                            <div
+                                className="bg-gradient-to-r from-blue-500 to-blue-600 h-full transition-all duration-300"
+                                style={{ width: `${validatedPercentage}%` }}
+                            />
+                        </div>
+                    </div>
+                )}
+
+                {/* Receita */}
+                <div className="flex justify-between text-xs text-muted-foreground pt-2 border-t border-border/50">
+                    <span className="flex items-center gap-1">
+                        <DollarSign className="w-3 h-3" />
+                        Receita
                     </span>
-                    <span className="font-semibold text-primary">{percentage}%</span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
-                    <div
-                        className="bg-primary h-full transition-all duration-300"
-                        style={{ width: `${percentage}%` }}
-                    />
-                </div>
-                <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>{available} disponíveis</span>
-                    <span>R$ {parseFloat(revenue).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                    <span className="font-semibold text-green-600">
+                        R$ {parseFloat(revenue).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </span>
                 </div>
             </div>
         </div>

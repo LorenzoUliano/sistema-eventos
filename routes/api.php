@@ -20,3 +20,5 @@ Route::get('/pix/payments/{id}/scan', function (string $id) {
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+

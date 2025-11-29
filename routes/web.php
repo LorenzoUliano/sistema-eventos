@@ -95,6 +95,10 @@ Route::prefix('promoter')->middleware('auth:promoter')->group(function () {
     Route::post('/events/{event}/tickets', [TicketController::class, 'store'])->name('promoter.tickets.store');
     Route::delete('/events/{event}/tickets/{ticket}', [TicketController::class, 'destroy'])->name('promoter.tickets.destroy');
 
+    // Validação de Ingressos
+    Route::get('/event/{id}/validate', [TicketController::class, 'validatePage'])->name('promoter.event.validate');
+    Route::post('/events/{id}/validate-ticket', [TicketController::class, 'validateTicket'])->name('promoter.event.validateTicket');
+
     // Logout do Promoter
     Route::post('/logout', [PromoterAuthenticatedSessionController::class, 'destroy'])->name('promoter.logout');
 

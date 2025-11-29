@@ -16,7 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
 
-        //
+        // Replace default CSRF middleware with custom one
+        $middleware->validateCsrfTokens(except: [
+            'promoter/events/*/validate-ticket',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

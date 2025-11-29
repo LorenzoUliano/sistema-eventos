@@ -24,7 +24,8 @@ import {
     Sparkles,
     ArrowUpDown,
     ArrowDown,
-    ArrowUp
+    ArrowUp,
+    Eye
 } from "lucide-react";
 
 export default function Order() {
@@ -431,26 +432,23 @@ export default function Order() {
                                                     {order.order_tickets && order.order_tickets.length > 0 && (
                                                         <div className="space-y-3 border-t pt-4">
                                                             {order.order_tickets.map((ot) => (
-                                                                <div key={ot.id} className="flex items-center justify-between p-3 border rounded-md">
+                                                                <div key={ot.id} className="flex items-center justify-between p-3 border rounded-md hover:border-primary/50 transition-colors">
                                                                     <div className="flex items-center gap-3">
                                                                         <Ticket className="w-4 h-4 text-muted-foreground" />
                                                                         <div className="text-sm">
                                                                             <div className="font-medium">Ingresso #{ot.id}</div>
                                                                             <div className="text-muted-foreground">Preço: {formatCurrency(parseFloat(ot.unit_price) || 0)}</div>
-                                                                            <div className="text-muted-foreground">Status: {ot.status}</div>
+                                                                            <Badge variant={ot.status === 'paid' ? 'default' : ot.status === 'validated' ? 'secondary' : 'outline'} className="mt-1">
+                                                                                {ot.status === 'paid' ? 'Pago' : ot.status === 'validated' ? 'Validado' : ot.status}
+                                                                            </Badge>
                                                                         </div>
                                                                     </div>
-                                                                    <div className="flex items-center gap-2">
-                                                                        <Button variant="outline" size="sm" onClick={() => router.get(`/orders/${order.id}`)}>
-                                                                            Ver detalhes
+                                                                    <Link href={`/order-tickets/${ot.id}`}>
+                                                                        <Button variant="default" size="sm" className="gap-2">
+                                                                            <Eye className="w-4 h-4" />
+                                                                            Ver QR Code
                                                                         </Button>
-                                                                        {/* Exemplo de ação por ticket: validar ou cancelar */}
-                                                                        {order.status === "paid" && (
-                                                                            <Button variant="secondary" size="sm" onClick={() => alert(`Ação para order_ticket ${ot.id}`)}>
-                                                                                Ação
-                                                                            </Button>
-                                                                        )}
-                                                                    </div>
+                                                                    </Link>
                                                                 </div>
                                                             ))}
                                                         </div>

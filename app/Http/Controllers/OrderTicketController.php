@@ -24,27 +24,16 @@ class OrderTicketController extends Controller
      */
     public function show(string $id)
     {
-        $orderTicket = OrderTicket::with(['order.tickets', 'ticket.event'])->findOrFail($id);
+        $orderTicket = OrderTicket::with([
+            'order',
+            'ticket.event.company'
+        ])->findOrFail($id);
+
         $this->authorizeView($orderTicket);
 
-        $scanUrl = rtrim(config('app.url'), '/') . '/order-tickets/' . $orderTicket->id . '/scan';
-
-        return Inertia::render('OrderTicket/Show', [
-            'orderTicket' => [
-                'id' => $orderTicket->id,
-                'status' => $orderTicket->status,
-                'quantity' => $orderTicket->quantity,
-                'total_price' => $orderTicket->total_price,
-                'scan_url' => $scanUrl,
-                'ticket' => $orderTicket->ticket ? [
-                    'id' => $orderTicket->ticket->id,
-                    'name' => $orderTicket->ticket->name,
-                    'event' => $orderTicket->ticket->event ? [
-                        'id' => $orderTicket->ticket->event->id,
-                        'name' => $orderTicket->ticket->event->name,
-                    ] : null,
-                ] : null,
-            ],
+        return Inertia::render('Order/OrderTicketDetails', [
+            'orderTicket' => $orderTicket,
+            'order' => $orderTicket->order,
         ]);
     }
 
