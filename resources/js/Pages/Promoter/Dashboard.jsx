@@ -33,48 +33,237 @@ import { ptBR } from "date-fns/locale";
 export default function Dashboard() {
     const { events } = usePage().props;
 
-    // Métricas rápidas
+    // Métricas gerais
     const totalEvents = events.length;
     const activeEvents = events.filter(e => e.status === 'active').length;
-    const totalTickets = events.reduce((acc, event) => acc + event.tickets.length, 0);
+    const inactiveEvents = events.filter(e => e.status === 'inactive').length;
+    const canceledEvents = events.filter(e => e.status === 'canceled').length;
+
+    // Métricas de ingressos
+    const totalTicketTypes = events.reduce((acc, event) => acc + event.tickets.length, 0);
+    const totalTicketsAvailable = events.reduce((acc, event) => {
+        return acc + event.tickets.reduce((sum, ticket) => sum + (parseInt(ticket.quantity) || 0), 0);
+    }, 0);
+    const totalTicketsSold = events.reduce((acc, event) => {
+        return acc + event.tickets.reduce((sum, ticket) => sum + (parseInt(ticket.sold) || 0), 0);
+    }, 0);
+    const totalTicketsValidated = events.reduce((acc, event) => {
+        return acc + event.tickets.reduce((sum, ticket) => sum + (parseInt(ticket.validated) || 0), 0);
+    }, 0);
+
+    // Métricas financeiras
+    const totalRevenue = events.reduce((acc, event) => {
+        return acc + event.tickets.reduce((sum, ticket) => {
+            const sold = parseInt(ticket.sold) || 0;
+            const price = parseFloat(ticket.price) || 0;
+            return sum + (sold * price);
+        }, 0);
+    }, 0);
+
+    const potentialRevenue = events.reduce((acc, event) => {
+        return acc + event.tickets.reduce((sum, ticket) => {
+            const quantity = parseInt(ticket.quantity) || 0;
+            const price = parseFloat(ticket.price) || 0;
+            return sum + (quantity * price);
+        }, 0);
+    }, 0);
+
+    const salesRate = totalTicketsAvailable > 0 ? ((totalTicketsSold / totalTicketsAvailable) * 100).toFixed(1) : 0;
+    const validationRate = totalTicketsSold > 0 ? ((totalTicketsValidated / totalTicketsSold) * 100).toFixed(1) : 0;
+
+    // Próximos eventos
+    const upcomingEvents = events
+        .filter(e => new Date(e.start_date) >= new Date() && e.status === 'active')
+        .sort((a, b) => new Date(a.start_date) - new Date(b.start_date))
+        .slice(0, 3);
 
     return (
         <PromoterLayout>
             <div className="space-y-8">
-                {/* Header */}
-                <div className="flex flex-col md:flex-row justify-between items-start gap-4">
-                    <div>
-                        <h1 className="text-3xl font-bold text-primary">Painel do Promoter</h1>
-                        <p className="text-muted-foreground mt-2">Gerencie seus eventos e acompanhe o desempenho</p>
+                {/* Header com gradiente */}
+                <div className="bg-gradient-to-r from-primary to-primary/80 rounded-xl p-8 text-secondary shadow-lg">
+                    <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+                        <div>
+                            <h1 className="text-3xl md:text-4xl font-bold mb-2">Painel do Promoter</h1>
+                            <p className="text-secondary/90 text-sm md:text-base">
+                                Gerencie seus eventos e acompanhe o desempenho em tempo real
+                            </p>
+                        </div>
+                        <Link href={route("promoter.event.create")} className="w-full md:w-auto">
+                            <Button className="gap-2 bg-white text-secondary hover:bg-white/90 shadow-md w-full md:w-auto">
+                                <Plus className="w-5 h-5" />
+                                Novo Evento
+                            </Button>
+                        </Link>
                     </div>
-                    <Link href={route("promoter.event.create")} className="w-full md:w-auto">
-                        <Button className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm transition-colors">
-                            <Plus className="w-5 h-5" />
-                            Novo Evento
-                        </Button>
-                    </Link>
                 </div>
 
-                {/* Métricas */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <CardMetric
-                        icon={<Ticket className="w-6 h-6" />}
-                        title="Eventos Ativos"
-                        value={activeEvents}
-                        color="text-green-500"
-                    />
-                    <CardMetric
-                        icon={<Users className="w-6 h-6" />}
-                        title="Total de Eventos"
-                        value={totalEvents}
-                        color="text-blue-500"
-                    />
-                    <CardMetric
-                        icon={<DollarSign className="w-6 h-6" />}
-                        title="Ingressos Disponíveis"
-                        value={totalTickets}
-                        color="text-purple-500"
-                    />
+                {/* Estatísticas Principais */}
+                <div>
+                    <h2 className="text-xl font-semibold text-foreground mb-4">Visão Geral</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <CardMetric
+                            icon={<Ticket className="w-6 h-6" />}
+                            title="Eventos Ativos"
+                            value={activeEvents}
+                            subtitle={`${totalEvents} total`}
+                            color="text-green-500"
+                            bgColor="bg-green-500/10"
+                        />
+                        <CardMetric
+                            icon={<Users className="w-6 h-6" />}
+                            title="Ingressos Vendidos"
+                            value={totalTicketsSold}
+                            subtitle={`de ${totalTicketsAvailable} disponíveis`}
+                            color="text-blue-500"
+                            bgColor="bg-blue-500/10"
+                        />
+                        <CardMetric
+                            icon={<CheckCircle2 className="w-6 h-6" />}
+                            title="Pessoas que Entraram"
+                            value={totalTicketsValidated}
+                            subtitle={`${validationRate}% dos vendidos`}
+                            color="text-purple-500"
+                            bgColor="bg-purple-500/10"
+                        />
+                        <CardMetric
+                            icon={<DollarSign className="w-6 h-6" />}
+                            title="Receita Total"
+                            value={`R$ ${(totalRevenue / 1000).toFixed(1)}k`}
+                            subtitle={`de R$ ${(potentialRevenue / 1000).toFixed(1)}k possível`}
+                            color="text-amber-500"
+                            bgColor="bg-amber-500/10"
+                        />
+                    </div>
+                </div>
+
+                {/* Performance e Próximos Eventos */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Performance Card */}
+                    <div className="lg:col-span-1">
+                        <div className="bg-card border border-border rounded-xl p-6 shadow-sm h-full">
+                            <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                                <TrendingUp className="w-5 h-5 text-primary" />
+                                Performance
+                            </h3>
+                            <div className="space-y-4">
+                                {/* Taxa de Vendas */}
+                                <div>
+                                    <div className="flex justify-between text-sm mb-2">
+                                        <span className="text-muted-foreground">Taxa de Vendas</span>
+                                        <span className="font-semibold text-primary">{salesRate}%</span>
+                                    </div>
+                                    <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+                                        <div
+                                            className="bg-gradient-to-r from-primary to-primary/80 h-full transition-all"
+                                            style={{ width: `${salesRate}%` }}
+                                        />
+                                    </div>
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                        {totalTicketsSold} vendidos de {totalTicketsAvailable}
+                                    </p>
+                                </div>
+
+                                {/* Taxa de Entrada */}
+                                <div>
+                                    <div className="flex justify-between text-sm mb-2">
+                                        <span className="text-muted-foreground">Taxa de Entrada</span>
+                                        <span className="font-semibold text-blue-600">{validationRate}%</span>
+                                    </div>
+                                    <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+                                        <div
+                                            className="bg-gradient-to-r from-blue-500 to-purple-500 h-full transition-all"
+                                            style={{ width: `${validationRate}%` }}
+                                        />
+                                    </div>
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                        {totalTicketsValidated} entraram de {totalTicketsSold} vendidos
+                                    </p>
+                                </div>
+
+                                {/* Status dos Eventos */}
+                                <div className="pt-4 border-t border-border">
+                                    <p className="text-sm font-medium text-foreground mb-3">Status dos Eventos</p>
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-green-600 flex items-center gap-1">
+                                                <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                                                Ativos
+                                            </span>
+                                            <span className="font-semibold">{activeEvents}</span>
+                                        </div>
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-amber-600 flex items-center gap-1">
+                                                <div className="w-2 h-2 rounded-full bg-amber-500"></div>
+                                                Inativos
+                                            </span>
+                                            <span className="font-semibold">{inactiveEvents}</span>
+                                        </div>
+                                        {canceledEvents > 0 && (
+                                            <div className="flex justify-between text-sm">
+                                                <span className="text-red-600 flex items-center gap-1">
+                                                    <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                                                    Cancelados
+                                                </span>
+                                                <span className="font-semibold">{canceledEvents}</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Próximos Eventos */}
+                    <div className="lg:col-span-2">
+                        <div className="bg-card border border-border rounded-xl p-6 shadow-sm h-full">
+                            <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                                <CalendarDays className="w-5 h-5 text-primary" />
+                                Próximos Eventos
+                            </h3>
+                            {upcomingEvents.length > 0 ? (
+                                <div className="space-y-3">
+                                    {upcomingEvents.map((event) => {
+                                        const daysUntil = differenceInDays(parseISO(event.start_date), new Date());
+                                        const sold = event.tickets.reduce((sum, t) => sum + (parseInt(t.sold) || 0), 0);
+                                        const total = event.tickets.reduce((sum, t) => sum + (parseInt(t.quantity) || 0), 0);
+                                        const percentage = total > 0 ? ((sold / total) * 100).toFixed(0) : 0;
+
+                                        return (
+                                            <div key={event.id} className="p-4 border border-border rounded-lg hover:border-primary/50 transition-colors">
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <div className="flex-1">
+                                                        <h4 className="font-semibold text-foreground">{event.name}</h4>
+                                                        <p className="text-sm text-muted-foreground">
+                                                            {format(parseISO(event.start_date), "dd MMM yyyy 'às' HH:mm", { locale: ptBR })}
+                                                        </p>
+                                                    </div>
+                                                    <Badge variant={daysUntil === 0 ? "default" : "secondary"}>
+                                                        {daysUntil === 0 ? "Hoje!" : `${daysUntil} dias`}
+                                                    </Badge>
+                                                </div>
+                                                <div className="flex items-center gap-4 text-sm">
+                                                    <div className="flex items-center gap-1 text-muted-foreground">
+                                                        <MapPin className="w-4 h-4" />
+                                                        {event.city} - {event.state}
+                                                    </div>
+                                                    <div className="flex items-center gap-1 text-muted-foreground">
+                                                        <Ticket className="w-4 h-4" />
+                                                        {sold}/{total} ({percentage}%)
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                <div className="text-center py-8 text-muted-foreground">
+                                    <CalendarDays className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                                    <p>Nenhum evento ativo agendado</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 </div>
 
                 {/* Lista de Eventos */}
@@ -103,16 +292,21 @@ export default function Dashboard() {
 }
 
 // Componente para Card de Métrica
-const CardMetric = ({ icon, title, value, color }) => (
-    <div className="bg-card p-6 rounded-xl border border-border shadow-sm hover:shadow-md transition-shadow">
-        <div className="flex items-center gap-4">
-            <div className={`p-3 rounded-lg bg-opacity-10 ${color} bg-current`}>
-                {icon}
+const CardMetric = ({ icon, title, value, subtitle, color, bgColor }) => (
+    <div className="bg-card p-6 rounded-xl border border-border shadow-sm hover:shadow-md transition-all hover:scale-105 duration-200">
+        <div className="flex items-start justify-between mb-4">
+            <div className={`p-3 rounded-lg ${bgColor}`}>
+                <div className={color}>
+                    {icon}
+                </div>
             </div>
-            <div>
-                <p className="text-muted-foreground text-sm">{title}</p>
-                <p className={`text-2xl font-bold ${color}`}>{value}</p>
-            </div>
+        </div>
+        <div>
+            <p className="text-muted-foreground text-sm mb-1">{title}</p>
+            <p className={`text-3xl font-bold ${color} mb-1`}>{value}</p>
+            {subtitle && (
+                <p className="text-xs text-muted-foreground">{subtitle}</p>
+            )}
         </div>
     </div>
 );
