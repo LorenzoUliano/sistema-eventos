@@ -286,19 +286,28 @@ export default function OrdersContent() {
                         {!isLoading && filteredAndSortedOrders && filteredAndSortedOrders.length > 0 ? (
                             <div className="space-y-4">
                                 {filteredAndSortedOrders.map((order) => {
-                                    const orderTotal = order.tickets?.reduce((sum, ticket) => {
-                                        return sum + (parseFloat(ticket.pivot?.total_price) || 0);
+                                    // Calcula o total do pedido somando todos os order_tickets
+                                    const orderTotal = order.order_tickets?.reduce((sum, ot) => {
+                                        return sum + (parseFloat(ot.unit_price) || 0);
                                     }, 0) || 0;
 
-                                    const totalTickets = order.tickets?.reduce((sum, ticket) => {
-                                        return sum + (parseInt(ticket.pivot?.quantity) || 0);
-                                    }, 0) || 0;
+                                    // Total de ingressos (cada order_ticket = 1 ingresso)
+                                    const totalTickets = order.order_tickets?.length || 0;
+
+                                    // Tipos diferentes de ingressos (agrupando pelo NOME do ticket)
+                                    const uniqueTicketTypes = order.order_tickets?.reduce((acc, ot) => {
+                                        const ticketName = ot.ticket?.name || 'Ingresso';
+                                        if (!acc.includes(ticketName)) {
+                                            acc.push(ticketName);
+                                        }
+                                        return acc;
+                                    }, []) || [];
+                                    const numberOfTicketTypes = uniqueTicketTypes.length;
 
                                     const eventName = getEventName(order);
                                     const isNew = isNewOrder(order.created_at);
                                     const hasIssues = order.status === "pending" &&
                                         new Date(order.created_at) < new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-                                    const firstTicketPivotId = order.tickets && order.tickets.length > 0 ? order.tickets[0].pivot.id : null;
 
                                     return (
                                         <Card
@@ -348,9 +357,9 @@ export default function OrdersContent() {
                                                                 {totalTickets} ingresso{totalTickets !== 1 ? 's' : ''}
                                                             </span>
                                                         </div>
-                                                        {order.tickets && order.tickets.length > 0 && (
+                                                        {numberOfTicketTypes > 0 && (
                                                             <div className="text-sm text-muted-foreground">
-                                                                {order.tickets.length} tipo{order.tickets.length !== 1 ? 's' : ''} diferente{order.tickets.length !== 1 ? 's' : ''}
+                                                                {numberOfTicketTypes} tipo{numberOfTicketTypes !== 1 ? 's' : ''}
                                                             </div>
                                                         )}
                                                     </div>
